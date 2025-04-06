@@ -1,0 +1,27 @@
+name: shopping
+description: "A new Flutter project."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.7.2 <4.0.0" # Ensures compatibility with Flutter SDK 3.x
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^0.13.6
+  shared_preferences: ^2.0.15
+  logger: ^1.1.0
+  flutter_riverpod: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/2.jpg
+    - assets/12.jpg # Ensure this path matches your directory structure
