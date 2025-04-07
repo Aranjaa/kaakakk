@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:logger/logger.dart'; // Importing logger
+import 'package:logger/logger.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -20,10 +20,10 @@ class ApiService {
       // Check if the response is successful
       if (response.statusCode == 200) {
         _logger.i('Login successful');
-        _logger.i('Response body: ${utf8.decode(response.bodyBytes)}');
+        _logger.i('Response body: ${response.body}'); // Simplified logging
 
         // Decode the response to get the token
-        final responseData = json.decode(utf8.decode(response.bodyBytes));
+        final responseData = json.decode(response.body);
         final String token = responseData['token'];
 
         // Save the token to SharedPreferences for future requests
@@ -33,10 +33,9 @@ class ApiService {
         return response;
       } else {
         _logger.e('Login failed: ${response.statusCode}');
-        _logger.e('Response body: ${utf8.decode(response.bodyBytes)}');
+        _logger.e('Response body: ${response.body}');
+        throw Exception('Login failed with status: ${response.statusCode}');
       }
-
-      return response;
     } catch (e) {
       _logger.e('Login error: $e');
       rethrow;
@@ -67,15 +66,80 @@ class ApiService {
       // Check if the response is successful
       if (response.statusCode == 201) {
         _logger.i('Registration successful');
-        _logger.i('Response body: ${utf8.decode(response.bodyBytes)}');
+        _logger.i('Response body: ${response.body}'); // Simplified logging
       } else {
         _logger.e('Registration failed: ${response.statusCode}');
-        _logger.e('Response body: ${utf8.decode(response.bodyBytes)}');
+        _logger.e('Response body: ${response.body}');
+        throw Exception(
+          'Registration failed with status: ${response.statusCode}',
+        );
       }
 
       return response;
     } catch (e) {
       _logger.e('Registration error: $e');
+      rethrow;
+    }
+  }
+
+  // Function to fetch categories
+  static Future<List<Map<String, dynamic>>> fetchCategories() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/categories/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _logger.i('Categories fetched successfully');
+        final List<dynamic> data = json.decode(response.body);
+        return List<Map<String, dynamic>>.from(data);
+      } else if (response.statusCode == 401) {
+        _logger.e('Unauthorized: Token expired or invalid');
+        throw Exception('Unauthorized: Token expired or invalid');
+      } else {
+        _logger.e('Failed to fetch categories: ${response.statusCode}');
+        _logger.e('Response body: ${response.body}');
+        throw Exception(
+          'Failed to fetch categories with status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      _logger.e('Error fetching categories: $e');
+      rethrow;
+    }
+  }
+
+  // Function to fetch subcategories
+  static Future<List<Map<String, dynamic>>> fetchSubcategories() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/subcategories/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _logger.i('Subcategories fetched successfully');
+        final List<dynamic> data = json.decode(response.body);
+        return List<Map<String, dynamic>>.from(data);
+      } else if (response.statusCode == 401) {
+        _logger.e('Unauthorized: Token expired or invalid');
+        throw Exception('Unauthorized: Token expired or invalid');
+      } else {
+        _logger.e('Failed to fetch subcategories: ${response.statusCode}');
+        _logger.e('Response body: ${response.body}');
+        throw Exception(
+          'Failed to fetch subcategories with status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      _logger.e('Error fetching subcategories: $e');
       rethrow;
     }
   }
@@ -104,38 +168,5 @@ class ApiService {
       _logger.e('Logout error: $e');
       rethrow;
     }
-  }
-
-  // Function to fetch products
-  static Future<List<Map<String, dynamic>>> fetchProducts() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/products/'),
-        headers: {"Content-Type": "application/json"},
-      );
-
-      if (response.statusCode == 200) {
-        _logger.i('Products fetched successfully');
-        final List<dynamic> data = json.decode(response.body);
-        return List<Map<String, dynamic>>.from(data);
-      } else {
-        _logger.e('Failed to fetch products: ${response.statusCode}');
-        throw Exception('Failed to fetch products');
-      }
-    } catch (e) {
-      _logger.e('Error fetching products: $e');
-      rethrow;
-    }
-  }
-}
-
-void getProducts() async {
-  try {
-    final products = await ApiService.fetchProducts();
-    for (var product in products) {
-      ApiService._logger.i('Product name: ${product['name']}');
-    }
-  } catch (e) {
-    ApiService._logger.e('Error fetching products: $e');
   }
 }

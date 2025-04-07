@@ -22,7 +22,7 @@ class AdminHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.blue[100],
       appBar: AppBar(
-        title: const Text('Adnib screen'),
+        title: const Text('Admin screen'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         actions: [

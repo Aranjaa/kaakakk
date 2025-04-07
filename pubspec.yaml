@@ -24,4 +24,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/2.jpg
-    - assets/12.jpg # Ensure this path matches your directory structure
+    - assets/12.jpg
