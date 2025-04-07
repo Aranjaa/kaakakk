@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping/services/api_service.dart';
-import 'package:shopping/view/Role_based_login/loginscreen.dart';
+import 'package:shopping/views/Role_based_login/loginscreen.dart';
 import 'package:logger/logger.dart'; // Import the logger package
 
 class SingUpscreen extends StatefulWidget {

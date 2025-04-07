@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping/services/api_service.dart';
-import 'package:shopping/view/Role_based_login/singup_screen.dart';
-import 'package:shopping/view/Role_based_login/admin/screen/admin_home_screen.dart';
-import 'package:shopping/view/Role_based_login/user/user_app_first_screen.dart';
+import 'package:shopping/views/Role_based_login/singup_screen.dart';
+import 'package:shopping/views/Role_based_login/admin/screen/admin_home_screen.dart';
+import 'package:shopping/views/Role_based_login/user/user_app_first_screen.dart';
 import 'package:logger/logger.dart'; // Importing logger package
 
 class Loginscreen extends StatefulWidget {

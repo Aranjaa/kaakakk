@@ -169,4 +169,30 @@ class ApiService {
       rethrow;
     }
   }
+
+  static Future<List<dynamic>> getProducts() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/products/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _logger.i('Бүтээгдэхүүнүүд амжилттай татагдлаа');
+        final List<dynamic> data = json.decode(response.body);
+        return data; // Бүтээгдэхүүнүүдийг буцаах
+      } else {
+        _logger.e(
+          'Бүтээгдэхүүнүүдийг татахад алдаа гарлаа: ${response.statusCode}',
+        );
+        throw Exception('Бүтээгдэхүүнүүдийг татахад алдаа гарлаа');
+      }
+    } catch (e) {
+      _logger.e('Бүтээгдэхүүн татах үед алдаа гарлаа: $e');
+      rethrow;
+    }
+  }
 }

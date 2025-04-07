@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shopping/view/Role_based_login/loginscreen.dart';
+import 'package:shopping/views/Role_based_login/loginscreen.dart';
 
 void main() {
   runApp(const MyApp());
