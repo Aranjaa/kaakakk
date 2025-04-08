@@ -42,14 +42,14 @@ class AddItemsState extends State<AddItems> {
       // Fetch categories
       final categories = await _apiController.fetchCategories();
       if (categories.isEmpty) {
-        _setErrorState('Categories data is empty');
+        _setErrorState('Ангилал өгөгдөл хоосон байна');
         return;
       }
 
       // Fetch subcategories
       final subcategories = await _apiController.fetchSubcategories();
       if (subcategories.isEmpty) {
-        _setErrorState('Subcategories data is empty');
+        _setErrorState('Дэд ангилал өгөгдөл хоосон байна');
         return;
       }
 
@@ -58,7 +58,7 @@ class AddItemsState extends State<AddItems> {
         _subcategories = subcategories;
       });
     } catch (e) {
-      _setErrorState('Error fetching data: $e');
+      _setErrorState('Алдаа гарлаа: $e');
     }
   }
 
@@ -73,7 +73,7 @@ class AddItemsState extends State<AddItems> {
   Future<void> _addItem() async {
     if (_selectedCategory == null || _selectedSubcategory == null) {
       setState(() {
-        _errorMessage = 'Please select category and subcategory';
+        _errorMessage = 'Ангилал ба дэд ангиллыг сонгоно уу';
       });
       return;
     }
@@ -82,16 +82,25 @@ class AddItemsState extends State<AddItems> {
         _priceController.text.isEmpty ||
         _stockController.text.isEmpty) {
       setState(() {
-        _errorMessage = 'All fields must be filled';
+        _errorMessage = 'Бүх талбарыг бөглөх ёстой';
       });
       return;
     }
 
-    // Additional validation for price and stock
+    // Validate price and stock
     if (double.tryParse(_priceController.text) == null ||
         int.tryParse(_stockController.text) == null) {
       setState(() {
-        _errorMessage = 'Please enter valid numbers for price and stock';
+        _errorMessage = 'Үнэ болон хувьцааны хүчинтэй дугаарыг оруулна уу';
+      });
+      return;
+    }
+
+    // Example: Ensure image URL is valid (if needed)
+    Uri? imageUrl = Uri.tryParse('your_image_url_here');
+    if (imageUrl == null || !imageUrl.hasAbsolutePath) {
+      setState(() {
+        _errorMessage = 'Зураг URL хүчинтэй биш байна';
       });
       return;
     }
@@ -109,19 +118,11 @@ class AddItemsState extends State<AddItems> {
       description: _descriptionController.text,
       price: double.parse(_priceController.text),
       stock: int.parse(_stockController.text),
-      imageUrl: 'image_url', // Modify if necessary
-      createdAt: DateTime.now().toIso8601String(),
-      category: Category(
-        id: category.id,
-        name: category.name,
-        description: category.description,
-      ),
-      subcategory: Subcategory(
-        id: subcategory.id,
-        categoryId: subcategory.categoryId,
-        name: subcategory.name,
-        description: subcategory.description,
-      ),
+      imageUrl: 'image_url_placeholder', // Update based on image upload or URL
+      category: category,
+      subcategory: subcategory,
+      color: [], // Example, implement color selection if needed
+      size: [], // Example, implement size selection if needed
     );
 
     setState(() {
@@ -135,20 +136,20 @@ class AddItemsState extends State<AddItems> {
           _isLoading = false;
           _errorMessage = null;
         });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Item added successfully')));
-        // Optionally, clear form or navigate back
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Бүтээгдэхүүн амжилттай нэмэгдлээ')),
+        );
+        // Optionally clear form or navigate back
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Failed to add item';
+          _errorMessage = 'Бүтээгдэхүүн нэмэхэд алдаа гарлаа';
         });
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Error: $e';
+        _errorMessage = 'Алдаа гарлаа: $e';
       });
     }
   }
@@ -156,7 +157,10 @@ class AddItemsState extends State<AddItems> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: const Text('Add Item')),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text('Бүтээгдэхүүн нэмэх'),
+      ),
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -179,8 +183,9 @@ class AddItemsState extends State<AddItems> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: _nameController,
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
-                          labelText: 'Item Name',
+                          labelText: 'Бүтээгдэхүүний нэр',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -188,16 +193,18 @@ class AddItemsState extends State<AddItems> {
                       TextField(
                         controller: _priceController,
                         keyboardType: TextInputType.number,
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
-                          labelText: 'Price',
+                          labelText: 'Үнэ',
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 10),
                       TextField(
                         controller: _descriptionController,
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
-                          labelText: 'Description',
+                          labelText: 'Тайлбар',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -205,17 +212,21 @@ class AddItemsState extends State<AddItems> {
                       TextField(
                         controller: _stockController,
                         keyboardType: TextInputType.number,
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
-                          labelText: 'Stock',
+                          labelText: 'Хувьцааны дугаар',
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text('Select Category:'),
+                      const Text(
+                        'Ангилал:',
+                        style: TextStyle(fontFamily: 'Roboto'),
+                      ),
                       DropdownButton<String>(
                         isExpanded: true,
                         value: _selectedCategory,
-                        hint: const Text('Choose Category'),
+                        hint: const Text('Ангилал сонгоно уу'),
                         onChanged: (String? newValue) {
                           setState(() {
                             _selectedCategory = newValue;
@@ -249,7 +260,7 @@ class AddItemsState extends State<AddItems> {
                       DropdownButton<String>(
                         isExpanded: true,
                         value: _selectedSubcategory,
-                        hint: const Text('Choose Subcategory'),
+                        hint: const Text('Дэд ангилал сонгоно уу'),
                         onChanged: (String? newValue) {
                           setState(() {
                             _selectedSubcategory = newValue;
@@ -268,13 +279,13 @@ class AddItemsState extends State<AddItems> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _addItem,
-                        child: const Text('Add Item'),
+                        child: const Text('Бүтээгдэхүүн нэмэх'),
                       ),
                       if (_errorMessage != null) ...[
                         const SizedBox(height: 20),
                         Text(
                           _errorMessage!,
-                          style: TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Colors.red),
                         ),
                       ],
                     ],

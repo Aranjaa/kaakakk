@@ -1,4 +1,4 @@
-import '../../../model/product_model.dart';
+import '../model/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -29,7 +29,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.black26,
-        title: Text("Default Product"),
+        title: Text("Бүтээгдэхүүн"),
         actions: [
           Stack(
             clipBehavior: Clip.none,
@@ -185,7 +185,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Color",
+                            "Өнгө",
                             style: TextStyle(
                               color: Colors.black54,
                               fontWeight: FontWeight.w500,
@@ -259,6 +259,11 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                                     final int index = entry.key;
                                     final String size = entry.value;
                                     return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedSizeIndex = index;
+                                        });
+                                      },
                                       child: Container(
                                         margin: EdgeInsets.only(
                                           top: 10,
@@ -310,10 +315,50 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
         backgroundColor: Colors.white,
-        elevation: 0,
-        label: Text(
-          "Add to Cart", // Update this text to display relevant action
-          style: TextStyle(color: Colors.black),
+        label: SizedBox(
+          width: size.width * 0.9,
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black26),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Iconsax.shopping_bag, color: Colors.black),
+                      SizedBox(width: 10),
+                      Text(
+                        'Картанд нэмэх',
+                        style: TextStyle(
+                          color: Colors.black,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 18),
+                          color: Colors.black,
+                          child: Center(
+                            child: Text(
+                              'Худалдаж авах',
+                              style: TextStyle(
+                                color: Colors.white,
+                                letterSpacing: -1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

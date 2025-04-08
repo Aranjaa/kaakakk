@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shopping/services/api_service.dart';
 import 'package:shopping/views/Role_based_login/singup_screen.dart';
 import 'package:shopping/views/Role_based_login/admin/screen/admin_home_screen.dart';
-import 'package:shopping/views/Role_based_login/user/user_app_first_screen.dart';
+import 'package:shopping/views/Role_based_login/user/Screen/user_app_first_screen.dart';
 import 'package:logger/logger.dart'; // Importing logger package
 
 class Loginscreen extends StatefulWidget {
@@ -120,7 +120,7 @@ class _LoginscreenState extends State<Loginscreen> {
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  labelText: "Email",
+                  labelText: "Майл хаяг",
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -128,7 +128,7 @@ class _LoginscreenState extends State<Loginscreen> {
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
-                  labelText: "Password",
+                  labelText: "Нууц үг",
                   border: OutlineInputBorder(),
                 ),
                 obscureText: true,
@@ -141,7 +141,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   child:
                       _isLoading
                           ? CircularProgressIndicator(color: Colors.white)
-                          : Text("Login"),
+                          : Text("Нэвтрэх"),
                 ),
               ),
               SizedBox(height: 15),

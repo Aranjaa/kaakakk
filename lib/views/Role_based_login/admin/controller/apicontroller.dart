@@ -35,15 +35,15 @@ class ApiController {
         if (data.isNotEmpty) {
           return data.map((json) => Subcategory.fromJson(json)).toList();
         } else {
-          throw Exception('No subcategories found');
+          throw Exception('Дэд ангилал олдсонгүй');
         }
       } else {
         throw Exception(
-          'Failed to load subcategories, status code: ${response.statusCode}',
+          'Дэд ангилал, статус кодыг ачаалж чадсангүй: ${response.statusCode}',
         );
       }
     } catch (e) {
-      throw Exception('Error fetching subcategories: $e');
+      throw Exception('Дэд ангилал олж авах: $e');
     }
   }
 
@@ -56,15 +56,15 @@ class ApiController {
         if (data.isNotEmpty) {
           return data.map((json) => Product.fromJson(json)).toList();
         } else {
-          throw Exception('No products found');
+          throw Exception('Ямар ч бүтээгдэхүүн олдсонгүй');
         }
       } else {
         throw Exception(
-          'Failed to load products, status code: ${response.statusCode}',
+          'Бүтээгдэхүүн, статус код ачаалахад амжилтгүй болсон: ${response.statusCode}',
         );
       }
     } catch (e) {
-      throw Exception('Error fetching products: $e');
+      throw Exception('Бүтээгдэхүүнээ татаж авах: $e');
     }
   }
 
@@ -81,7 +81,9 @@ class ApiController {
           'price': product.price,
           'description': product.description,
           'stock': product.stock,
-          'image_url': product.imageUrl,
+          'color': product.color,
+          'size': product.size,
+          'imageUrl': product.imageUrl,
         }),
       );
 
@@ -89,11 +91,11 @@ class ApiController {
         return true; // Product added successfully
       } else {
         throw Exception(
-          'Failed to add product, status code: ${response.statusCode}',
+          'Бүтээгдэхүүн, статус код нэмж чадсангүй: ${response.statusCode}',
         );
       }
     } catch (e) {
-      throw Exception('Error adding product: $e');
+      throw Exception('Бүтээгдэхүүн нэмэх: $e');
     }
   }
 }

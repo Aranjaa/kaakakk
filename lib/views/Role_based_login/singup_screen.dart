@@ -66,7 +66,7 @@ class _SingUpscreenState extends State<SingUpscreen> {
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: "Email",
+                    labelText: "Майл хаяг",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -74,7 +74,7 @@ class _SingUpscreenState extends State<SingUpscreen> {
                 TextField(
                   controller: _usernameController,
                   decoration: InputDecoration(
-                    labelText: "Username",
+                    labelText: "Хэрэглэгчийн нэр",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -98,7 +98,7 @@ class _SingUpscreenState extends State<SingUpscreen> {
                 TextField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: "Password",
+                    labelText: "Нууц үг",
                     border: OutlineInputBorder(),
                   ),
                   obscureText: true,
@@ -108,7 +108,7 @@ class _SingUpscreenState extends State<SingUpscreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _handleSignUp,
-                    child: Text("Sign Up"),
+                    child: Text("Бүртгүүлэх"),
                   ),
                 ),
                 SizedBox(height: 15),

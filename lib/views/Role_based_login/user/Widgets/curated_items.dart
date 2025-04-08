@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../model/product_model.dart';
+import '../model/product_model.dart';
 
 class CuratedItems extends StatelessWidget {
   final Product productModel;

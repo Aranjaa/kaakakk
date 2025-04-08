@@ -68,7 +68,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Scaffold(
       backgroundColor: Colors.blue[100],
       appBar: AppBar(
-        title: const Text('Admin screen'),
+        title: const Text('Админ хуудас'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         actions: [

@@ -18,7 +18,7 @@ class MyBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "New collections",
+                  "Шинэ цуглуулга",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -60,7 +60,7 @@ class MyBanner extends StatelessWidget {
                   onPressed: () {},
                   color: Colors.black12,
                   child: Text(
-                    "Shop Now",
+                    "Одоо худалдаж аваарай",
                     style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),

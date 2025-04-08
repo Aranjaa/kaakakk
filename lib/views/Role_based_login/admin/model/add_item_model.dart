@@ -56,10 +56,11 @@ class Product {
   final String description;
   final double price;
   final int stock;
-  final String imageUrl; // Updated field name to 'imageUrl'
-  final String createdAt;
+  final String imageUrl;
   final Category category;
   final Subcategory subcategory;
+  final List<String> color; // Added color
+  final List<String> size; // Added size
 
   Product({
     required this.id,
@@ -68,38 +69,24 @@ class Product {
     required this.price,
     required this.stock,
     required this.imageUrl,
-    required this.createdAt,
     required this.category,
     required this.subcategory,
+    required this.color, // Added color
+    required this.size, // Added size
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      description: json['description'] ?? '',
-      price:
-          double.tryParse(json['price'].toString()) ??
-          0.0, // Safe price parsing
-      stock: json['stock'] ?? 0,
-      imageUrl: json['image'] ?? '', // Corrected to 'imageUrl'
-      createdAt: json['created_at'] ?? '',
-      category: Category.fromJson(json['category'] ?? {}),
-      subcategory: Subcategory.fromJson(json['subcategory'] ?? {}),
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      price: json['price'],
+      stock: json['stock'],
+      imageUrl: json['imageUrl'],
+      category: Category.fromJson(json['category']),
+      subcategory: Subcategory.fromJson(json['subcategory']),
+      color: List<String>.from(json['color'] ?? []), // Parsing color list
+      size: List<String>.from(json['size'] ?? []), // Parsing size list
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'price': price,
-      'stock': stock,
-      'image': imageUrl, // Corrected to 'imageUrl'
-      'created_at': createdAt,
-      'category': category.toJson(),
-      'subcategory': subcategory.toJson(),
-    };
   }
 }

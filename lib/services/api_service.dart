@@ -19,7 +19,7 @@ class ApiService {
 
       // Check if the response is successful
       if (response.statusCode == 200) {
-        _logger.i('Login successful');
+        _logger.i('Нэвтрэлт амжилттай');
         _logger.i('Response body: ${response.body}'); // Simplified logging
 
         // Decode the response to get the token
@@ -32,12 +32,12 @@ class ApiService {
 
         return response;
       } else {
-        _logger.e('Login failed: ${response.statusCode}');
+        _logger.e('Нэвтрэх үед алдаа гарлаа: ${response.statusCode}');
         _logger.e('Response body: ${response.body}');
-        throw Exception('Login failed with status: ${response.statusCode}');
+        throw Exception('Нэвтрэх үед алдаа гарлаа: ${response.statusCode}');
       }
     } catch (e) {
-      _logger.e('Login error: $e');
+      _logger.e('Нэвтрэх үед алдаа гарлаа: $e');
       rethrow;
     }
   }
@@ -65,19 +65,21 @@ class ApiService {
 
       // Check if the response is successful
       if (response.statusCode == 201) {
-        _logger.i('Registration successful');
+        _logger.i('Хэрэглэгч амжилттай бүртгүүлэв');
         _logger.i('Response body: ${response.body}'); // Simplified logging
       } else {
-        _logger.e('Registration failed: ${response.statusCode}');
+        _logger.e(
+          'Хэрэглэгч бүртгүүлэх үед алдаа гарлаа: ${response.statusCode}',
+        );
         _logger.e('Response body: ${response.body}');
         throw Exception(
-          'Registration failed with status: ${response.statusCode}',
+          'Хэрэглэгч бүртгүүлэх үед алдаа гарлаа: ${response.statusCode}',
         );
       }
 
       return response;
     } catch (e) {
-      _logger.e('Registration error: $e');
+      _logger.e('Хэрэглэгч бүртгүүлэх үед алдаа гарлаа: $e');
       rethrow;
     }
   }
@@ -94,21 +96,21 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        _logger.i('Categories fetched successfully');
+        _logger.i('Ангилал амжилттай татагдлаа');
         final List<dynamic> data = json.decode(response.body);
         return List<Map<String, dynamic>>.from(data);
       } else if (response.statusCode == 401) {
-        _logger.e('Unauthorized: Token expired or invalid');
-        throw Exception('Unauthorized: Token expired or invalid');
-      } else {
-        _logger.e('Failed to fetch categories: ${response.statusCode}');
-        _logger.e('Response body: ${response.body}');
+        _logger.e('Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон');
         throw Exception(
-          'Failed to fetch categories with status: ${response.statusCode}',
+          'Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон',
         );
+      } else {
+        _logger.e('Ангилал татахад алдаа гарлаа: ${response.statusCode}');
+        _logger.e('Response body: ${response.body}');
+        throw Exception('Ангилал татахад алдаа гарлаа: ${response.statusCode}');
       }
     } catch (e) {
-      _logger.e('Error fetching categories: $e');
+      _logger.e('Ангилал татахад алдаа гарлаа: $e');
       rethrow;
     }
   }
@@ -125,21 +127,23 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        _logger.i('Subcategories fetched successfully');
+        _logger.i('Дэд ангилал амжилттай татагдлаа');
         final List<dynamic> data = json.decode(response.body);
         return List<Map<String, dynamic>>.from(data);
       } else if (response.statusCode == 401) {
-        _logger.e('Unauthorized: Token expired or invalid');
-        throw Exception('Unauthorized: Token expired or invalid');
+        _logger.e('Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон');
+        throw Exception(
+          'Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон',
+        );
       } else {
-        _logger.e('Failed to fetch subcategories: ${response.statusCode}');
+        _logger.e('Дэд ангилал татахад алдаа гарлаа: ${response.statusCode}');
         _logger.e('Response body: ${response.body}');
         throw Exception(
-          'Failed to fetch subcategories with status: ${response.statusCode}',
+          'Дэд ангилал татахад алдаа гарлаа: ${response.statusCode}',
         );
       }
     } catch (e) {
-      _logger.e('Error fetching subcategories: $e');
+      _logger.e('Дэд ангилал татахад алдаа гарлаа: $e');
       rethrow;
     }
   }
@@ -163,9 +167,9 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
 
-      _logger.i('User successfully logged out');
+      _logger.i('Хэрэглэгч амжилттай гарлаа');
     } catch (e) {
-      _logger.e('Logout error: $e');
+      _logger.e('Гарахад алдаа гарлаа: $e');
       rethrow;
     }
   }
