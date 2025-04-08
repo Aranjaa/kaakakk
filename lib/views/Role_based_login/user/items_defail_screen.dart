@@ -2,9 +2,10 @@ import '../../../model/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
-class ItemsDefailScreen extends StatelessWidget {
-  final ProductModel productModel;
+class ItemsDefailScreen extends StatefulWidget {
+  final Product productModel;
   const ItemsDefailScreen({super.key, required this.productModel});
+
   @override
   State<ItemsDefailScreen> createState() => _ItemsDefailScreenState();
 }
@@ -13,6 +14,13 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
   int currentIndex = 0;
   int selectedColorIndex = 1;
   int selectedSizeIndex = 1;
+  Color selectedColor = Colors.blue; // Define a selected color variable
+
+  // Helper method to convert a hex string to a Color
+  Color _hexToColor(String hex) {
+    return Color(int.parse('FF$hex', radix: 16));
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -21,7 +29,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.black26,
-        title: Text("Defaul Product"),
+        title: Text("Default Product"),
         actions: [
           Stack(
             clipBehavior: Clip.none,
@@ -52,7 +60,6 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
           SizedBox(width: 20),
         ],
       ),
-
       body: ListView(
         children: [
           Container(
@@ -149,7 +156,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                     SizedBox(width: 5),
                     if (widget.productModel.isCheck == true)
                       Text(
-                        "\$${widget.productModel.price + 255}.00",
+                        "\$${widget.productModel.price}.00",
                         style: TextStyle(
                           color: Colors.black26,
                           decoration: TextDecoration.lineThrough,
@@ -160,7 +167,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                 ),
                 SizedBox(height: 15),
                 Text(
-                  "$description ${widget.productModel.description}$description2 ",
+                  "${widget.productModel.description}",
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -186,26 +193,47 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                           ),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(children: widget.productModel.color.asMap().entries.map((entry){
-                              final int index = entry.key;
-                              final color = entry.value;
-                              return Padding(
-                                padding: EdgeInsets.only(top: 10,right: 10),
-                                Child: CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: color,
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedColorIndex = index;
-                                      });
-                                    },
-                                    child: Icon(Icons.check, color: selectedColorIndex == index ? Colors.white : Colors.transparent,),
-                                  ),
-                                )
-                              )
-                            }).toList(),
-                            ),)
+                            child: Row(
+                              children:
+                                  widget.productModel.color.asMap().entries.map((
+                                    entry,
+                                  ) {
+                                    final int index = entry.key;
+                                    final String colorStr =
+                                        entry
+                                            .value; // Get the color as a string
+                                    final Color color = _hexToColor(
+                                      colorStr,
+                                    ); // Convert to Color
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        top: 10,
+                                        right: 10,
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 18,
+                                        backgroundColor: color,
+                                        child: InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedColorIndex = index;
+                                              selectedColor =
+                                                  color; // Update color
+                                            });
+                                          },
+                                          child: Icon(
+                                            Icons.check,
+                                            color:
+                                                selectedColorIndex == index
+                                                    ? Colors.white
+                                                    : Colors.transparent,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -223,30 +251,51 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                           ),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(children: widget.productModel.size.asMap().entries.map((entry){
-                              final int index = entry.key;
-                              final String size = entry.value;
-                              return GestureDetector(
-                                child: Container(
-                                  margin: EdgeInsets.only(top:10, right: 10),
-                                  height: 35, width: 35,  decoration: BoxDecoration(
-                                    shape: BoxShape.circle, color: selectedSizeIndex == index ? color : Colors.black12, color: Colors.white, 
-                                    border: Border.all(
-                                      color: selectedSizeIndex == index ? color: Colors.black, color : Colors.black12
+                            child: Row(
+                              children:
+                                  widget.productModel.size.asMap().entries.map((
+                                    entry,
+                                  ) {
+                                    final int index = entry.key;
+                                    final String size = entry.value;
+                                    return GestureDetector(
+                                      child: Container(
+                                        margin: EdgeInsets.only(
+                                          top: 10,
+                                          right: 10,
+                                        ),
+                                        height: 35,
+                                        width: 35,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color:
+                                              selectedSizeIndex == index
+                                                  ? selectedColor
+                                                  : Colors.black12,
+                                          border: Border.all(
+                                            color:
+                                                selectedSizeIndex == index
+                                                    ? selectedColor
+                                                    : Colors.black12,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            size,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color:
+                                                  selectedSizeIndex == index
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: selectedSizeIndex == index ? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            }).toList(),
-                            ),)
+                                    );
+                                  }).toList(),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -257,14 +306,16 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
           ),
         ],
       ),
-      floatingActionButtonlocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
+        backgroundColor: Colors.white,
         elevation: 0,
         label: Text(
-          width:size.width * 0.9,
-        )
-      );    
+          "Add to Cart", // Update this text to display relevant action
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
     );
   }
 }

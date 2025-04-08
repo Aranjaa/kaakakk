@@ -10,6 +10,11 @@ class Product {
   final String image;
   final Category category;
   final Subcategory subcategory;
+  final double rating;
+  final int reviews;
+  final bool isCheck;
+  final List<String> color; // Added color
+  final List<String> size; // Added size
 
   Product({
     required this.id,
@@ -20,6 +25,11 @@ class Product {
     required this.image,
     required this.category,
     required this.subcategory,
+    required this.rating,
+    required this.reviews,
+    required this.isCheck,
+    required this.color, // Added color
+    required this.size, // Added size
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -32,6 +42,11 @@ class Product {
       image: json['image'],
       category: Category.fromJson(json['category']),
       subcategory: Subcategory.fromJson(json['subcategory']),
+      rating: json['rating'],
+      reviews: json['reviews'],
+      isCheck: json['isCheck'],
+      color: List<String>.from(json['color'] ?? []), // Parsing color list
+      size: List<String>.from(json['size'] ?? []), // Parsing size list
     );
   }
 }

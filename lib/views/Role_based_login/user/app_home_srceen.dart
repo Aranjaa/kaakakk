@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../Widgets/banner.dart';
 import '../../../model/category_model.dart';
-import '../../../model/subcategory_model.dart';
 import '../../../model/product_model.dart';
-import '../user/items_defail_screen.dart';
-import 'package:iconsax/iconsax.dart';
+import '../../../services/api_service.dart'; // <-- import your service
 
 class AppHomeScreen extends StatefulWidget {
   const AppHomeScreen({super.key});
@@ -15,145 +12,108 @@ class AppHomeScreen extends StatefulWidget {
 }
 
 class _AppHomeScreenState extends State<AppHomeScreen> {
+  List<Category> categories = [];
+  List<Product> products = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    try {
+      final categoryJsonList = await ApiService.fetchCategories();
+      final productJsonList = await ApiService.getProducts();
+
+      setState(() {
+        categories = categoryJsonList.map((e) => Category.fromJson(e)).toList();
+        products = productJsonList.map((e) => Product.fromJson(e)).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset("assets/123.jpg"),
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Icon(Iconsax.shopping_bag, size: 28),
-                      Positioned(
-                        right: -3,
-                        top: -5,
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              "3",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-            MyBanner(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const MyBanner(),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Shop By Category",
-                    style: TextStyle(
-                      fontSize: 16,
-                      letterSpacing: 0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    "See All",
-                    style: TextStyle(
-                      fontSize: 16,
-                      letterSpacing: 0,
-                      color: Colors.black45,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(
-                  Category.length,
-                  (index) => InkWell(
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Colors.black,
-                            backgroundImage: AssetImage(
-                              Category[index]['image'],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(Category[index]['name']),
-                      ],
-                    ),
-                  ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  "Shop By Category",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Curated of you",
-                    style: TextStyle(
-                      fontSize: 16,
-                      letterSpacing: 0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    "See All",
-                    style: TextStyle(
-                      fontSize: 16,
-                      letterSpacing: 0,
-                      color: Colors.black45,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(children: List.generate(Product.length, (index)=> {
-                final ProductModel = Product[index]; 
-                return Padding(padding: index == 0 ? EdgeInsets.symmetric(horizontal: 20): EdgeInsets.only(right: 20),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => ItemsDefailScreen(productModel: ProductModel,),),);
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text(
+                          category.name,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    );
                   },
-                  child: CuratedItems(Product: Product, size: size,),
-                ),),
-              })),
-            ),
-          ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  "Featured Products",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return ListTile(
+                    leading: Image.network(
+                      product.image,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
+                    title: Text(product.name),
+                    subtitle: Text("${product.price}₮"),
+                    onTap: () {
+                      // Navigate to detail screen
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

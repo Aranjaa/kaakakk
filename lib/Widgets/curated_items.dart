@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../model/product_model.dart';
 
 class CuratedItems extends StatelessWidget {
-  final ProductModel productModel;
-  const CuratedItems({super.key required this.productModel});
+  final Product productModel;
+  const CuratedItems({super.key, required this.productModel});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    Size size = MediaQuery.of(context).size; // Get the size of the screen
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
@@ -16,7 +18,9 @@ class CuratedItems extends StatelessWidget {
             color: Colors.black,
             image: DecorationImage(
               fit: BoxFit.cover,
-              image: AssetImage(Product.image),
+              image: AssetImage(
+                productModel.image, // Use productModel.image
+              ),
             ),
           ),
           height: size.height * 0.25,
@@ -33,12 +37,11 @@ class CuratedItems extends StatelessWidget {
             ),
           ),
         ),
-
         SizedBox(height: 7),
         Row(
           children: [
             Text(
-              "H&M",
+              productModel.category.name, // Use productModel.category.name
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Colors.black26,
@@ -46,15 +49,15 @@ class CuratedItems extends StatelessWidget {
             ),
             SizedBox(width: 5),
             Icon(Icons.star, color: Colors.amber, size: 17),
-            Text(Product.rating.toString()),
+            Text(productModel.rating.toString()), // Use productModel.rating
             Text(
-              '(${Product.reviews})',
+              '(${productModel.reviews})', // Use productModel.reviews
               style: TextStyle(color: Colors.black26),
             ),
             SizedBox(
               width: size.width * 0.5,
               child: Text(
-                Product.name,
+                productModel.name, // Use productModel.name
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -69,7 +72,7 @@ class CuratedItems extends StatelessWidget {
         Row(
           children: [
             Text(
-              "\$${Product.price.toString()}.00",
+              "\$${productModel.price.toString()}.00", // Use productModel.price
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
@@ -78,9 +81,9 @@ class CuratedItems extends StatelessWidget {
               ),
             ),
             SizedBox(width: 5),
-            if (Product.isCheck == true)
+            if (productModel.isCheck == true) // Use productModel.isCheck
               Text(
-                "\$${Product.price + 255}.00",
+                "\$${double.parse(productModel.price) + 255}.00", // Ensure price calculation is correct
                 style: TextStyle(
                   color: Colors.black26,
                   decoration: TextDecoration.lineThrough,
