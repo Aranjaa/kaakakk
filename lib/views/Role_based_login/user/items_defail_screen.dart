@@ -11,6 +11,8 @@ class ItemsDefailScreen extends StatelessWidget {
 
 class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
   int currentIndex = 0;
+  int selectedColorIndex = 1;
+  int selectedSizeIndex = 1;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -162,8 +164,8 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black26,
-                    height: 1.5,
+                    color: Colors.black38,
+                    letterSpacing: -0.5,
                   ),
                 ),
                 SizedBox(height: 20),
@@ -184,8 +186,67 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                           ),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(children: widget.,),
-                          )
+                            child: Row(children: widget.productModel.color.asMap().entries.map((entry){
+                              final int index = entry.key;
+                              final color = entry.value;
+                              return Padding(
+                                padding: EdgeInsets.only(top: 10,right: 10),
+                                Child: CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: color,
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedColorIndex = index;
+                                      });
+                                    },
+                                    child: Icon(Icons.check, color: selectedColorIndex == index ? Colors.white : Colors.transparent,),
+                                  ),
+                                )
+                              )
+                            }).toList(),
+                            ),)
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: size.width / 2.4,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Size",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(children: widget.productModel.size.asMap().entries.map((entry){
+                              final int index = entry.key;
+                              final String size = entry.value;
+                              return GestureDetector(
+                                child: Container(
+                                  margin: EdgeInsets.only(top:10, right: 10),
+                                  height: 35, width: 35,  decoration: BoxDecoration(
+                                    shape: BoxShape.circle, color: selectedSizeIndex == index ? color : Colors.black12, color: Colors.white, 
+                                    border: Border.all(
+                                      color: selectedSizeIndex == index ? color: Colors.black, color : Colors.black12
+                                      ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: selectedSizeIndex == index ? Colors.white : Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            }).toList(),
+                            ),)
                         ],
                       ),
                     ),
@@ -196,6 +257,14 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
           ),
         ],
       ),
+      floatingActionButtonlocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {},
+        elevation: 0,
+        label: Text(
+          width:size.width * 0.9,
+        )
+      );    
     );
   }
 }

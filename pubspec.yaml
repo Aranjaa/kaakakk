@@ -28,3 +28,7 @@ flutter:
     - assets/12.jpg
     - assets/123.jpg
     - assets/1234.jpg
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
