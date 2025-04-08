@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import '../model/category_model.dart';
 import '../model/subcategory_model.dart';
 import '../model/product_model.dart';
 import '../Widgets/curated_items.dart';
