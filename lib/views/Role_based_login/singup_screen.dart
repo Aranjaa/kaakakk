@@ -65,6 +65,9 @@ class _SingUpscreenState extends State<SingUpscreen> {
                 SizedBox(height: 15),
                 TextField(
                   controller: _emailController,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                  ), // Apply Roboto font here
                   decoration: InputDecoration(
                     labelText: "Майл хаяг",
                     border: OutlineInputBorder(),
@@ -73,6 +76,9 @@ class _SingUpscreenState extends State<SingUpscreen> {
                 SizedBox(height: 15),
                 TextField(
                   controller: _usernameController,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                  ), // Apply Roboto font here
                   decoration: InputDecoration(
                     labelText: "Хэрэглэгчийн нэр",
                     border: OutlineInputBorder(),
@@ -81,22 +87,31 @@ class _SingUpscreenState extends State<SingUpscreen> {
                 SizedBox(height: 15),
                 TextField(
                   controller: _lastnameController,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                  ), // Apply Roboto font here
                   decoration: InputDecoration(
-                    labelText: "овог",
+                    labelText: "Овог",
                     border: OutlineInputBorder(),
                   ),
                 ),
                 SizedBox(height: 15),
                 TextField(
                   controller: _firstnameController,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                  ), // Apply Roboto font here
                   decoration: InputDecoration(
-                    labelText: "нэр",
+                    labelText: "Нэр",
                     border: OutlineInputBorder(),
                   ),
                 ),
                 SizedBox(height: 15),
                 TextField(
                   controller: _passwordController,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                  ), // Apply Roboto font here
                   decoration: InputDecoration(
                     labelText: "Нууц үг",
                     border: OutlineInputBorder(),
@@ -108,14 +123,25 @@ class _SingUpscreenState extends State<SingUpscreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _handleSignUp,
-                    child: Text("Бүртгүүлэх"),
+                    child: Text(
+                      "Бүртгүүлэх",
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                      ), // Apply Roboto font here
+                    ),
                   ),
                 ),
                 SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text("Бүртгэлтэй юу?", style: TextStyle(fontSize: 18)),
+                    Text(
+                      "Бүртгэлтэй юу?",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'Roboto',
+                      ), // Apply Roboto font here
+                    ),
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -130,6 +156,7 @@ class _SingUpscreenState extends State<SingUpscreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
                           letterSpacing: -1,
+                          fontFamily: 'Roboto', // Apply Roboto font here
                         ),
                       ),
                     ),

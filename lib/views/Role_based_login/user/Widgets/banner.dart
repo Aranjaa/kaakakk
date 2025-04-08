@@ -23,6 +23,7 @@ class MyBanner extends StatelessWidget {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -2,
+                    fontFamily: 'Roboto', // Roboto шрифт
                   ),
                 ),
                 Row(
@@ -34,6 +35,7 @@ class MyBanner extends StatelessWidget {
                         height: 0,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -3,
+                        fontFamily: 'Roboto', // Roboto шрифт
                       ),
                     ),
                     Column(
@@ -41,7 +43,10 @@ class MyBanner extends StatelessWidget {
                       children: [
                         Text(
                           "%",
-                          style: TextStyle(fontWeight: FontWeight.w900),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Roboto', // Roboto шрифт
+                          ),
                         ),
                         Text(
                           "off",
@@ -50,6 +55,7 @@ class MyBanner extends StatelessWidget {
                             letterSpacing: -1.5,
                             fontWeight: FontWeight.bold,
                             height: 0.6,
+                            fontFamily: 'Roboto', // Roboto шрифт
                           ),
                         ),
                       ],
@@ -61,7 +67,11 @@ class MyBanner extends StatelessWidget {
                   color: Colors.black12,
                   child: Text(
                     "Одоо худалдаж аваарай",
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontFamily: 'Roboto', // Roboto шрифт
+                    ),
                   ),
                 ),
               ],

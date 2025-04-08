@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/product_model.dart';
+import '../../../../core/model/product_model.dart';
 
 class CuratedItems extends StatelessWidget {
   final Product productModel;
@@ -45,14 +45,23 @@ class CuratedItems extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Colors.black26,
+                fontFamily: 'Roboto', // Roboto шрифт
               ),
             ),
             SizedBox(width: 5),
             Icon(Icons.star, color: Colors.amber, size: 17),
-            Text(productModel.rating.toString()), // Use productModel.rating
+            Text(
+              productModel.rating.toString(), // Use productModel.rating
+              style: TextStyle(
+                fontFamily: 'Roboto', // Roboto шрифт
+              ),
+            ),
             Text(
               '(${productModel.reviews})', // Use productModel.reviews
-              style: TextStyle(color: Colors.black26),
+              style: TextStyle(
+                color: Colors.black26,
+                fontFamily: 'Roboto', // Roboto шрифт
+              ),
             ),
             SizedBox(
               width: size.width * 0.5,
@@ -64,6 +73,7 @@ class CuratedItems extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                   height: 1.5,
+                  fontFamily: 'Roboto', // Roboto шрифт
                 ),
               ),
             ),
@@ -78,6 +88,7 @@ class CuratedItems extends StatelessWidget {
                 fontSize: 18,
                 color: Colors.pink,
                 height: 1.5,
+                fontFamily: 'Roboto', // Roboto шрифт
               ),
             ),
             SizedBox(width: 5),
@@ -88,6 +99,7 @@ class CuratedItems extends StatelessWidget {
                   color: Colors.black26,
                   decoration: TextDecoration.lineThrough,
                   decorationColor: Colors.black26,
+                  fontFamily: 'Roboto', // Roboto шрифт
                 ),
               ),
           ],

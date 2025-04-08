@@ -119,6 +119,9 @@ class _LoginscreenState extends State<Loginscreen> {
               SizedBox(height: 20),
               TextField(
                 controller: _emailController,
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                ), // Apply Roboto font here
                 decoration: InputDecoration(
                   labelText: "Майл хаяг",
                   border: OutlineInputBorder(),
@@ -127,6 +130,9 @@ class _LoginscreenState extends State<Loginscreen> {
               SizedBox(height: 15),
               TextField(
                 controller: _passwordController,
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                ), // Apply Roboto font here
                 decoration: InputDecoration(
                   labelText: "Нууц үг",
                   border: OutlineInputBorder(),
@@ -141,14 +147,20 @@ class _LoginscreenState extends State<Loginscreen> {
                   child:
                       _isLoading
                           ? CircularProgressIndicator(color: Colors.white)
-                          : Text("Нэвтрэх"),
+                          : Text(
+                            "Нэвтэрэх",
+                            style: TextStyle(fontFamily: 'Roboto'),
+                          ),
                 ),
               ),
               SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text("Бүртгэлгүй юу?", style: TextStyle(fontSize: 18)),
+                  Text(
+                    "Бүртгэлгүй юу?",
+                    style: TextStyle(fontSize: 18, fontFamily: 'Roboto'),
+                  ),
                   InkWell(
                     onTap: () {
                       Navigator.push(
@@ -163,6 +175,7 @@ class _LoginscreenState extends State<Loginscreen> {
                         fontWeight: FontWeight.bold,
                         color: Colors.blue,
                         letterSpacing: -1,
+                        fontFamily: 'Roboto',
                       ),
                     ),
                   ),

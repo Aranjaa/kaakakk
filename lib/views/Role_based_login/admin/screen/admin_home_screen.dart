@@ -21,24 +21,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     _loadProducts();
   }
 
-  // API-аас бүтээгдэхүүн татах функц
   Future<void> _loadProducts() async {
     try {
-      final response =
-          await ApiService.getProducts(); // API-с бүтээгдэхүүн татаж авах
+      final response = await ApiService.getProducts();
       setState(() {
-        products = response; // Бүтээгдэхүүнүүдийг хадгалах
-        filteredProducts = products; // Анхны шүүлт нь бүгдийг харах
+        products = response;
+        filteredProducts = products;
       });
     } catch (e) {
-      // Алдаа гарах тохиолдолд
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Өгөгдөл татах үед алдаа гарлаа: $e')),
       );
     }
   }
 
-  // Шүүлт хийх функц
   void _filterProducts(String query) {
     final filtered =
         products.where((product) {
@@ -52,14 +48,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     });
   }
 
-  // Logout function
   Future<void> _handleLogout(BuildContext context) async {
     await ApiService.logout();
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => const Loginscreen(),
-      ), // Redirect to login screen
+      MaterialPageRoute(builder: (context) => const Loginscreen()),
     );
   }
 
@@ -74,8 +67,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed:
-                () => _handleLogout(context), // Logout when button is pressed
+            onPressed: () => _handleLogout(context),
           ),
         ],
       ),
@@ -84,11 +76,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         child: Column(
           children: [
             TextField(
-              onChanged: _filterProducts, // Шүүлт хийх
+              onChanged: _filterProducts,
               decoration: const InputDecoration(
                 labelText: 'Хайх...',
                 border: OutlineInputBorder(),
               ),
+              style: TextStyle(fontFamily: 'Roboto'), // Roboto шрифт
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -100,15 +93,39 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16.0),
-                      title: Text(product['name']),
+                      title: Text(
+                        product['name'],
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Roboto', // Roboto шрифт
+                        ),
+                      ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Үнэ: ${product['price']}'),
-                          Text('Сагсанд: ${product['stock']} ширхэг'),
-                          Text('Ангилал: ${product['category']['name']}'),
+                          Text(
+                            'Үнэ: ${product['price']}',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                            ), // Roboto шрифт
+                          ),
+                          Text(
+                            'Сагсанд: ${product['stock']} ширхэг',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                            ), // Roboto шрифт
+                          ),
+                          Text(
+                            'Ангилал: ${product['category']['name']}',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                            ), // Roboto шрифт
+                          ),
                           Text(
                             'Дэд ангилал: ${product['subcategory']['name']}',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                            ), // Roboto шрифт
                           ),
                         ],
                       ),

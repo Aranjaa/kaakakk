@@ -183,7 +183,9 @@ class AddItemsState extends State<AddItems> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: _nameController,
-                        style: const TextStyle(fontFamily: 'Roboto'),
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                        ), // Roboto шрифт
                         decoration: const InputDecoration(
                           labelText: 'Бүтээгдэхүүний нэр',
                           border: OutlineInputBorder(),
@@ -193,7 +195,9 @@ class AddItemsState extends State<AddItems> {
                       TextField(
                         controller: _priceController,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(fontFamily: 'Roboto'),
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                        ), // Roboto шрифт
                         decoration: const InputDecoration(
                           labelText: 'Үнэ',
                           border: OutlineInputBorder(),
@@ -202,7 +206,9 @@ class AddItemsState extends State<AddItems> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: _descriptionController,
-                        style: const TextStyle(fontFamily: 'Roboto'),
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                        ), // Roboto шрифт
                         decoration: const InputDecoration(
                           labelText: 'Тайлбар',
                           border: OutlineInputBorder(),
@@ -212,7 +218,9 @@ class AddItemsState extends State<AddItems> {
                       TextField(
                         controller: _stockController,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(fontFamily: 'Roboto'),
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                        ), // Roboto шрифт
                         decoration: const InputDecoration(
                           labelText: 'Хувьцааны дугаар',
                           border: OutlineInputBorder(),
@@ -221,7 +229,7 @@ class AddItemsState extends State<AddItems> {
                       const SizedBox(height: 20),
                       const Text(
                         'Ангилал:',
-                        style: TextStyle(fontFamily: 'Roboto'),
+                        style: TextStyle(fontFamily: 'Roboto'), // Roboto шрифт
                       ),
                       DropdownButton<String>(
                         isExpanded: true,
@@ -255,6 +263,9 @@ class AddItemsState extends State<AddItems> {
                                   ),
                                 )
                                 .toList(),
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                        ), // Roboto шрифт
                       ),
                       const SizedBox(height: 10),
                       DropdownButton<String>(
@@ -275,6 +286,9 @@ class AddItemsState extends State<AddItems> {
                                   ),
                                 )
                                 .toList(),
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                        ), // Roboto шрифт
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(

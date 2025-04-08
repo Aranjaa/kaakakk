@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import '../model/subcategory_model.dart';
-import '../model/product_model.dart';
+import '../../../../core/model/subcategory_model.dart';
+import '../../../../core/model/product_model.dart';
 import '../Widgets/curated_items.dart';
 
 class CategoryItems extends StatelessWidget {
@@ -165,6 +165,7 @@ class CategoryItems extends StatelessWidget {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black26,
+                                    fontFamily: 'Roboto', // Here
                                   ),
                                 ),
 
@@ -194,6 +195,7 @@ class CategoryItems extends StatelessWidget {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
+                                    fontFamily: 'Roboto', // Here
                                   ),
                                 ),
 
@@ -206,6 +208,7 @@ class CategoryItems extends StatelessWidget {
                                         fontWeight: FontWeight.w600,
                                         fontSize: 18,
                                         color: Colors.pink,
+                                        fontFamily: 'Roboto', // Here
                                       ),
                                     ),
                                     SizedBox(width: 6),
@@ -216,6 +219,7 @@ class CategoryItems extends StatelessWidget {
                                           color: Colors.black26,
                                           decoration:
                                               TextDecoration.lineThrough,
+                                          fontFamily: 'Roboto', // Here
                                         ),
                                       ),
                                   ],

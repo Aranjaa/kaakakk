@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shopping/views/Role_based_login/user/Widgets/curated_items.dart';
 import '../Widgets/banner.dart';
-import '../model/category_model.dart';
-import '../model/product_model.dart';
-import 'items_defail_screen.dart';
+import '../../../../core/model/category_model.dart';
+import '../../../../core/model/product_model.dart';
+import 'items_detail_screen/screen/items_defail_screen.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../../services/api_service.dart';
 import 'package:logger/logger.dart'; // Logger ашигласан
@@ -19,17 +19,14 @@ class AppHomeScreen extends StatefulWidget {
 class _AppHomeScreenState extends State<AppHomeScreen> {
   List<Category> categories = [];
   List<Product> products = [];
-  // Энд өмнө нь байхгүй categoryItems-ийг устгаж, бүтээгдэхүүнийг ангилалаар шүүх products-ыг ашиглая.
-  var _logger = Logger(); // Logger инициалчилсан
+  var _logger = Logger();
 
   @override
   void initState() {
     super.initState();
-    // Скрин дүүрэхэд ангилал, бүтээгдэхүүнийг татаж авна.
     _fetchData();
   }
 
-  // Ангилал, бүтээгдэхүүнийг татах функц
   Future<void> _fetchData() async {
     try {
       List<Map<String, dynamic>> fetchedCategories =
@@ -48,7 +45,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                 .toList();
       });
     } catch (e) {
-      _logger.e('Алдаа: $e'); // Алдааг логлосон
+      _logger.e('Алдаа: $e');
     }
   }
 
@@ -60,7 +57,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
         child: Column(
           children: [
             const SizedBox(height: 50),
-            // Header хэсэг: логог харуулах ба саганы дугаар
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -97,9 +93,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // Баннер хэсэг
             const MyBanner(),
-            // Ангилал гарчиг ба "Бүгдийг харах"
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
               child: Row(
@@ -111,6 +105,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                       fontSize: 16,
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
+                      fontFamily: 'Roboto', // Roboto шрифт
                     ),
                   ),
                   Text(
@@ -120,7 +115,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                 ],
               ),
             ),
-            // Ангилалыг шалгах хэсэг
             FutureBuilder(
               future: _fetchData(),
               builder: (context, snapshot) {
@@ -135,7 +129,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                       children: List.generate(categories.length, (index) {
                         return InkWell(
                           onTap: () {
-                            // Бүтээгдэхүүний жагсаалтаас тухайн ангиллын бүтээгдэхүүнийг шүүж байна.
                             final filterItems =
                                 products
                                     .where(
@@ -145,7 +138,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                                     )
                                     .toList();
 
-                            // Энд CategoryItems хуудас руу шилжиж, ангиллын нэр ба шүүсэн бүтээгдэхүүнийг дамжуулж байна.
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -153,7 +145,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                                     (_) => CategoryItems(
                                       category: categories[index].name,
                                       categoryItems: filterItems,
-                                      // Subcategories өгөгдөөгүй тул хоосон лист дамжуулж байна.
                                       subcategories: [],
                                     ),
                               ),
@@ -164,7 +155,12 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                             child: Column(
                               children: [
                                 const SizedBox(height: 10),
-                                Text(categories[index].name),
+                                Text(
+                                  categories[index].name,
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto', // Roboto шрифт
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -175,7 +171,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                 }
               },
             ),
-            // "Танд зориулагдсан" бүтээгдэхүүний жагсаалт
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
               child: Row(
@@ -187,6 +182,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                       fontSize: 16,
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
+                      fontFamily: 'Roboto', // Roboto шрифт
                     ),
                   ),
                   Text(
