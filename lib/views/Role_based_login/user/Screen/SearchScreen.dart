@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping/services/api_service.dart';
 import '../../../../core/model/product_model.dart';
-import '../Widgets/curated_items.dart'; // Import the CuratedItems widget
+import 'items_detail_screen/screen/items_defail_screen.dart'; // Make sure to import the ItemsDefailScreen widget
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -74,16 +74,18 @@ class _SearchScreenState extends State<SearchScreen> {
                             title: Text(product.name),
                             subtitle: Text('${product.price}₮'),
                             onTap: () {
-                              // Navigate to CuratedItems screen and pass the selected product
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder:
-                                      (context) =>
-                                          CuratedItems(productModel: product),
+                                      (_) => ItemsDefailScreen(
+                                        productModel:
+                                            product, // Pass the correct product object here
+                                      ),
                                 ),
                               );
                             },
+                            // Pass the correct product object here
                           );
                         },
                       ),
