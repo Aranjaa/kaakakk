@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
+import 'package:shopping/core/model/profiles_model.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -199,6 +200,62 @@ class ApiService {
       }
     } catch (e) {
       _logger.e('Бүтээгдэхүүн татах үед алдаа гарлаа: $e');
+      rethrow;
+    }
+  }
+
+  static Future<List<dynamic>> searchProducts(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/products/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+
+        // Нэрээр хайж шүүх
+        final List<dynamic> filtered =
+            data.where((product) {
+              final productName =
+                  product['name']?.toString().toLowerCase() ?? '';
+              return productName.contains(query.toLowerCase());
+            }).toList();
+
+        return filtered;
+      } else {
+        _logger.e('Хайлтын үед алдаа гарлаа: ${response.statusCode}');
+        throw Exception('Хайлтын үед алдаа гарлаа');
+      }
+    } catch (e) {
+      _logger.e('Хайлтын үед алдаа гарлаа: $e');
+      rethrow;
+    }
+  }
+
+  static Future<UserProfile> fetchUserProfile() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/user-profile/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        return UserProfile.fromJson(
+          data,
+        ); // Энэ хэсэгт ганц хэрэглэгчийн мэдээллийг буцааж байна
+      } else {
+        throw Exception("Профайл татахад алдаа гарлаа: ${response.statusCode}");
+      }
+    } catch (e) {
+      _logger.e("Профайл татах үед алдаа: $e");
       rethrow;
     }
   }

@@ -15,11 +15,11 @@ class CuratedItems extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Colors.black,
+            color: Colors.white,
             image: DecorationImage(
               fit: BoxFit.cover,
-              image: AssetImage(
-                productModel.image, // Use productModel.image
+              image: NetworkImage(
+                productModel.image, // Use productModel.image for network image
               ),
             ),
           ),
@@ -82,7 +82,7 @@ class CuratedItems extends StatelessWidget {
         Row(
           children: [
             Text(
-              "\$${productModel.price.toString()}.00", // Use productModel.price
+              "\$${productModel.price.toString()}", // Use productModel.price
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
@@ -94,7 +94,7 @@ class CuratedItems extends StatelessWidget {
             SizedBox(width: 5),
             if (productModel.isCheck == true) // Use productModel.isCheck
               Text(
-                "\$${double.parse(productModel.price) + 255}.00", // Ensure price calculation is correct
+                "\$${double.parse(productModel.price) + 255}", // Ensure price calculation is correct
                 style: TextStyle(
                   color: Colors.black26,
                   decoration: TextDecoration.lineThrough,
