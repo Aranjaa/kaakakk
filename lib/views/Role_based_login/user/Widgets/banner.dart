@@ -78,7 +78,10 @@ class MyBanner extends StatelessWidget {
             ),
             Align(
               alignment: Alignment.bottomRight,
-              child: Image.asset("assets/1234.jpg", height: size.height * 0.18),
+              child: Image.asset(
+                "assets/12345.png",
+                height: size.height * 0.20,
+              ),
             ),
           ],
         ),

@@ -76,7 +76,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    Image.asset(
+                    Image.network(
                       product.image,
                       height: size.height * 0.4,
                       width: size.width * 0.85,
@@ -309,7 +309,9 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                  ), // Adjusted vertical padding
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black26),
                   ),
@@ -331,7 +333,9 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
               ),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15,
+                  ), // Adjusted vertical padding
                   color: Colors.black,
                   child: const Center(
                     child: Text(

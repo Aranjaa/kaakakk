@@ -16,6 +16,7 @@ dependencies:
   flutter_riverpod: ^2.0.0
   iconsax: ^0.0.8
   image_picker: ^1.0.4
+  cached_network_image: ^3.2.0
 
 dev_dependencies:
   flutter_test:
@@ -28,7 +29,7 @@ flutter:
     - assets/2.jpg
     - assets/12.jpg
     - assets/123.jpg
-    - assets/1234.jpg
+    - assets/12345.png
   fonts:
     - family: RobotoSerif
       fonts:

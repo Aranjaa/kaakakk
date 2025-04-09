@@ -181,7 +181,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                       fontSize: 16,
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Roboto', // Roboto шрифт
+                      fontFamily: 'Roboto', // Roboto font
                     ),
                   ),
                   Text(

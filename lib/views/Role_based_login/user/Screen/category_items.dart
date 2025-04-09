@@ -3,6 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../../core/model/subcategory_model.dart';
 import '../../../../core/model/product_model.dart';
 import '../Widgets/curated_items.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // Import for cached network images
 
 class CategoryItems extends StatelessWidget {
   final String category;
@@ -139,7 +140,13 @@ class CategoryItems extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     image: DecorationImage(
-                                      image: AssetImage(item.image),
+                                      image:
+                                          item.image.startsWith("http")
+                                              ? CachedNetworkImageProvider(
+                                                item.image,
+                                              ) // For network images
+                                              : AssetImage(item.image)
+                                                  as ImageProvider, // For local assets
                                       fit: BoxFit.cover,
                                     ),
                                   ),

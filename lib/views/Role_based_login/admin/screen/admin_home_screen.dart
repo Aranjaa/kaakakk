@@ -130,7 +130,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         ],
                       ),
                       trailing: Image.network(
-                        product['image'],
+                        product['image'], // Энэ URL нь зөв байх ёстой
                         width: 50,
                         height: 50,
                         fit: BoxFit.cover,
