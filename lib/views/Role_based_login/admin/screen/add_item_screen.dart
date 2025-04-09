@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io'; // To handle file system
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:image_picker/image_picker.dart'; // Import image_picker
 import '../model/add_item_model.dart'; // Import your Product model
 import '../controller/apicontroller.dart'; // Your ApiController
 
@@ -30,6 +32,8 @@ class AddItemsState extends State<AddItems> {
 
   bool _isLoading = false;
   String? _errorMessage;
+
+  File? _imageFile; // File to hold the selected image
 
   @override
   void initState() {
@@ -96,11 +100,10 @@ class AddItemsState extends State<AddItems> {
       return;
     }
 
-    // Example: Ensure image URL is valid (if needed)
-    Uri? imageUrl = Uri.tryParse('your_image_url_here');
-    if (imageUrl == null || !imageUrl.hasAbsolutePath) {
+    // Ensure an image is selected
+    if (_imageFile == null) {
       setState(() {
-        _errorMessage = 'Зураг URL хүчинтэй биш байна';
+        _errorMessage = 'Зураг сонгоно уу';
       });
       return;
     }
@@ -118,7 +121,7 @@ class AddItemsState extends State<AddItems> {
       description: _descriptionController.text,
       price: double.parse(_priceController.text),
       stock: int.parse(_stockController.text),
-      imageUrl: 'image_url_placeholder', // Update based on image upload or URL
+      imageUrl: 'image_url_placeholder', // This will be the path to the image
       category: category,
       subcategory: subcategory,
       color: [], // Example, implement color selection if needed
@@ -154,6 +157,23 @@ class AddItemsState extends State<AddItems> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    } else {
+      setState(() {
+        _errorMessage = 'Зураг сонгоогүй байна';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,21 +191,29 @@ class AddItemsState extends State<AddItems> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                            borderRadius: BorderRadius.circular(10),
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            height: 150,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              border: Border.all(),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child:
+                                _imageFile == null
+                                    ? const Icon(Icons.camera_alt, size: 50)
+                                    : Image.file(
+                                      _imageFile!,
+                                      fit: BoxFit.cover,
+                                    ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 10),
                       TextField(
                         controller: _nameController,
-                        style: const TextStyle(
-                          fontFamily: 'Roboto',
-                        ), // Roboto шрифт
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
                           labelText: 'Бүтээгдэхүүний нэр',
                           border: OutlineInputBorder(),
@@ -195,9 +223,7 @@ class AddItemsState extends State<AddItems> {
                       TextField(
                         controller: _priceController,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(
-                          fontFamily: 'Roboto',
-                        ), // Roboto шрифт
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
                           labelText: 'Үнэ',
                           border: OutlineInputBorder(),
@@ -206,9 +232,7 @@ class AddItemsState extends State<AddItems> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: _descriptionController,
-                        style: const TextStyle(
-                          fontFamily: 'Roboto',
-                        ), // Roboto шрифт
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
                           labelText: 'Тайлбар',
                           border: OutlineInputBorder(),
@@ -218,9 +242,7 @@ class AddItemsState extends State<AddItems> {
                       TextField(
                         controller: _stockController,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(
-                          fontFamily: 'Roboto',
-                        ), // Roboto шрифт
+                        style: const TextStyle(fontFamily: 'Roboto'),
                         decoration: const InputDecoration(
                           labelText: 'Хувьцааны дугаар',
                           border: OutlineInputBorder(),
@@ -229,17 +251,20 @@ class AddItemsState extends State<AddItems> {
                       const SizedBox(height: 20),
                       const Text(
                         'Ангилал:',
-                        style: TextStyle(fontFamily: 'Roboto'), // Roboto шрифт
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          color: Colors.black,
+                        ),
                       ),
                       DropdownButton<String>(
                         isExpanded: true,
                         value: _selectedCategory,
                         hint: const Text('Ангилал сонгоно уу'),
+                        dropdownColor: Colors.white,
                         onChanged: (String? newValue) {
                           setState(() {
                             _selectedCategory = newValue;
                             _selectedSubcategory = null;
-                            // Filter subcategories based on selected category
                             _filteredSubcategories =
                                 _subcategories
                                     .where(
@@ -255,41 +280,41 @@ class AddItemsState extends State<AddItems> {
                           });
                         },
                         items:
-                            _categories
-                                .map(
-                                  (cat) => DropdownMenuItem<String>(
-                                    value: cat.name,
-                                    child: Text(cat.name),
-                                  ),
-                                )
-                                .toList(),
+                            _categories.map((cat) {
+                              return DropdownMenuItem<String>(
+                                value: cat.name,
+                                child: Text(cat.name),
+                              );
+                            }).toList(),
                         style: const TextStyle(
                           fontFamily: 'Roboto',
-                        ), // Roboto шрифт
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       DropdownButton<String>(
                         isExpanded: true,
                         value: _selectedSubcategory,
                         hint: const Text('Дэд ангилал сонгоно уу'),
+                        dropdownColor: Colors.white,
                         onChanged: (String? newValue) {
                           setState(() {
                             _selectedSubcategory = newValue;
                           });
                         },
                         items:
-                            _filteredSubcategories
-                                .map(
-                                  (sub) => DropdownMenuItem<String>(
-                                    value: sub.name,
-                                    child: Text(sub.name),
-                                  ),
-                                )
-                                .toList(),
+                            _filteredSubcategories.map((sub) {
+                              return DropdownMenuItem<String>(
+                                value: sub.name,
+                                child: Text(sub.name),
+                              );
+                            }).toList(),
                         style: const TextStyle(
                           fontFamily: 'Roboto',
-                        ), // Roboto шрифт
+                          color: Colors.black,
+                        ),
                       ),
+
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _addItem,

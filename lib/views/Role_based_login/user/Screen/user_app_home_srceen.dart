@@ -62,7 +62,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.asset("assets/123.jpg"),
                   Stack(
                     clipBehavior: Clip.none,
                     children: [

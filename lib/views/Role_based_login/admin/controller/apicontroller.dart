@@ -10,7 +10,8 @@ class ApiController {
     try {
       final response = await http.get(Uri.parse('$baseUrl/categories/'));
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        // UTF-8 кодчилол ашиглаж текст задлах
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         if (data.isNotEmpty) {
           return data.map((json) => Category.fromJson(json)).toList();
         } else {
@@ -31,7 +32,8 @@ class ApiController {
     try {
       final response = await http.get(Uri.parse('$baseUrl/subcategories/'));
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        // UTF-8 кодчилол ашиглаж текст задлах
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         if (data.isNotEmpty) {
           return data.map((json) => Subcategory.fromJson(json)).toList();
         } else {
@@ -52,7 +54,8 @@ class ApiController {
     try {
       final response = await http.get(Uri.parse('$baseUrl/products/'));
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        // UTF-8 кодчилол ашиглаж текст задлах
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         if (data.isNotEmpty) {
           return data.map((json) => Product.fromJson(json)).toList();
         } else {

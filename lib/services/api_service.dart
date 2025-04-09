@@ -97,7 +97,8 @@ class ApiService {
 
       if (response.statusCode == 200) {
         _logger.i('Ангилал амжилттай татагдлаа');
-        final List<dynamic> data = json.decode(response.body);
+        // UTF-8 кодчилол ашиглаж текст задлах
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return List<Map<String, dynamic>>.from(data);
       } else if (response.statusCode == 401) {
         _logger.e('Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон');
@@ -128,7 +129,8 @@ class ApiService {
 
       if (response.statusCode == 200) {
         _logger.i('Дэд ангилал амжилттай татагдлаа');
-        final List<dynamic> data = json.decode(response.body);
+        // UTF-8 кодчилол ашиглаж текст задлах
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return List<Map<String, dynamic>>.from(data);
       } else if (response.statusCode == 401) {
         _logger.e('Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон');
@@ -186,7 +188,8 @@ class ApiService {
 
       if (response.statusCode == 200) {
         _logger.i('Бүтээгдэхүүнүүд амжилттай татагдлаа');
-        final List<dynamic> data = json.decode(response.body);
+        // UTF-8 кодчилол ашиглаж текст задлах
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return data; // Бүтээгдэхүүнүүдийг буцаах
       } else {
         _logger.e(
