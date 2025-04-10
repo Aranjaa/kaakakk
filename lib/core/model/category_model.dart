@@ -12,4 +12,7 @@ class Category {
       description: json['description'] ?? '',
     );
   }
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name};
+  }
 }

@@ -21,10 +21,6 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
   Color selectedColor = Colors.blue;
   bool isFavorite = false; // Track favorite status
 
-  Color _hexToColor(String hex) {
-    return Color(int.parse('FF$hex', radix: 16));
-  }
-
   void _addToCart() {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     cartProvider.addToCart(widget.productModel);
@@ -38,13 +34,6 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Худалдаж авах хэсэг рүү шилжиж байна...')),
     );
-  }
-
-  // Toggle favorite status
-  void _toggleFavorite() {
-    setState(() {
-      isFavorite = !isFavorite;
-    });
   }
 
   @override

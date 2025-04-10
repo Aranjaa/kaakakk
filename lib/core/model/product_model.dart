@@ -67,4 +67,22 @@ class Product {
       ), // Fallback to empty list if 'size' is null
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'price': price,
+      'stock': stock,
+      'image': image,
+      'category': category.toJson(), // Assuming Category class has toJson
+      'subcategory':
+          subcategory.toJson(), // Assuming Subcategory class has toJson
+      'rating': rating,
+      'reviews': reviews,
+      'isCheck': isCheck,
+      'color': color,
+      'size': size,
+    };
+  }
 }

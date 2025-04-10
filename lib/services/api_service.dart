@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
+import '../core/model/product_model.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -266,6 +267,55 @@ class ApiService {
     } catch (e) {
       _logger.e("Профайл татах үед алдаа: $e");
       rethrow;
+    }
+  }
+
+  Future<bool> editProduct(Product product) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/products/${product.id}/'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': product.name,
+          'category': product.category.id,
+          'subcategory': product.subcategory.id,
+          'price': product.price,
+          'description': product.description,
+          'stock': product.stock,
+          'color': product.color,
+          'size': product.size,
+          'imageUrl': product.image,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Product updated successfully
+      } else {
+        throw Exception(
+          'Бүтээгдэхүүн, статус код засах боломжгүй: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Бүтээгдэхүүн засах: $e');
+    }
+  }
+
+  // Delete a product (DELETE)
+  static Future<bool> deleteProduct(String productId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/products/$productId/'),
+      );
+
+      if (response.statusCode == 204) {
+        return true; // Product deleted successfully
+      } else {
+        throw Exception(
+          'Бүтээгдэхүүн устгах боломжгүй, статус код: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Бүтээгдэхүүн устгах: $e');
     }
   }
 }

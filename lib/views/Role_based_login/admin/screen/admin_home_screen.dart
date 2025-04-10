@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping/services/api_service.dart';
 import 'package:shopping/views/Role_based_login/admin/screen/add_item_screen.dart';
+import './EditProductScreen.dart'; // Add the import for the edit screen
 import 'package:shopping/views/Role_based_login/loginscreen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -56,6 +57,33 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
+  // Delete product
+  Future<void> _deleteProduct(String productId) async {
+    try {
+      final isSuccess = await ApiService.deleteProduct(productId);
+      if (isSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Бүтээгдэхүүн амжилттай устгагдлаа')),
+        );
+        _loadProducts(); // Reload products after deletion
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Бүтээгдэхүүн устгах үед алдаа гарлаа: $e')),
+      );
+    }
+  }
+
+  // Navigate to edit product screen
+  void _editProduct(BuildContext context, dynamic product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProductScreen(product: product),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +109,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 labelText: 'Хайх...',
                 border: OutlineInputBorder(),
               ),
-              style: TextStyle(fontFamily: 'Roboto'), // Roboto шрифт
+              style: TextStyle(fontFamily: 'Roboto'),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -97,7 +125,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         product['name'],
                         style: const TextStyle(
                           fontSize: 18,
-                          fontFamily: 'Roboto', // Roboto шрифт
+                          fontFamily: 'Roboto',
                         ),
                       ),
                       subtitle: Column(
@@ -105,36 +133,32 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         children: [
                           Text(
                             'Үнэ: ${product['price']}',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                            ), // Roboto шрифт
+                            style: TextStyle(fontFamily: 'Roboto'),
                           ),
                           Text(
                             'Сагсанд: ${product['stock']} ширхэг',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                            ), // Roboto шрифт
+                            style: TextStyle(fontFamily: 'Roboto'),
                           ),
                           Text(
                             'Ангилал: ${product['category']['name']}',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                            ), // Roboto шрифт
+                            style: TextStyle(fontFamily: 'Roboto'),
                           ),
                           Text(
                             'Дэд ангилал: ${product['subcategory']['name']}',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                            ), // Roboto шрифт
+                            style: TextStyle(fontFamily: 'Roboto'),
                           ),
                         ],
                       ),
                       trailing: Image.network(
-                        product['image'], // Энэ URL нь зөв байх ёстой
+                        product['image'],
                         width: 50,
                         height: 50,
                         fit: BoxFit.cover,
                       ),
+                      onTap:
+                          () => _editProduct(context, product), // Edit action
+                      onLongPress:
+                          () => _deleteProduct(product['id']), // Delete action
                     ),
                   );
                 },
