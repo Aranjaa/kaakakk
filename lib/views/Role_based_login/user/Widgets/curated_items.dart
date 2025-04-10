@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/model/product_model.dart';
+import '../../../../core/Provider/FavoriteProvider.dart'; // Make sure this is imported
 
 class CuratedItems extends StatelessWidget {
   final Product productModel;
+
   const CuratedItems({super.key, required this.productModel});
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size; // Get the size of the screen
+    Size size = MediaQuery.of(context).size; // Screen size
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -18,88 +21,117 @@ class CuratedItems extends StatelessWidget {
             color: Colors.white,
             image: DecorationImage(
               fit: BoxFit.cover,
-              image: NetworkImage(
-                productModel.image, // Use productModel.image for network image
-              ),
+              image: NetworkImage(productModel.image),
             ),
           ),
           height: size.height * 0.25,
           width: size.width * 0.5,
           child: Padding(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: Align(
               alignment: Alignment.topRight,
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: Colors.black26,
-                child: Icon(Icons.favorite_border),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.favorite_border,
+                    color:
+                        Provider.of<FavoriteProvider>(
+                              context,
+                            ).favoriteItems.contains(productModel)
+                            ? Colors.red
+                            : Colors.black26,
+                  ),
+                  onPressed: () {
+                    final favoriteProvider = Provider.of<FavoriteProvider>(
+                      context,
+                      listen: false,
+                    );
+                    if (favoriteProvider.favoriteItems.contains(productModel)) {
+                      favoriteProvider.removeFromFavorites(
+                        productModel,
+                      ); // Remove from favorites
+                    } else {
+                      favoriteProvider.addToFavorites(
+                        productModel,
+                      ); // Add to favorites
+                    }
+                  },
+                ),
               ),
             ),
           ),
         ),
-        SizedBox(height: 7),
+        const SizedBox(height: 7),
+
+        // First row: category, rating, reviews
         Row(
           children: [
             Text(
-              productModel.category.name, // Use productModel.category.name
-              style: TextStyle(
+              productModel.category.name,
+              style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Colors.black26,
-                fontFamily: 'Roboto', // Roboto шрифт
+                fontFamily: 'Roboto',
               ),
             ),
-            SizedBox(width: 5),
-            Icon(Icons.star, color: Colors.amber, size: 17),
+            const SizedBox(width: 5),
+            const Icon(Icons.star, color: Colors.amber, size: 17),
             Text(
-              productModel.rating.toString(), // Use productModel.rating
-              style: TextStyle(
-                fontFamily: 'Roboto', // Roboto шрифт
-              ),
+              productModel.rating.toString(),
+              style: const TextStyle(fontFamily: 'Roboto'),
             ),
             Text(
-              '(${productModel.reviews})', // Use productModel.reviews
-              style: TextStyle(
+              ' (${productModel.reviews})',
+              style: const TextStyle(
                 color: Colors.black26,
-                fontFamily: 'Roboto', // Roboto шрифт
-              ),
-            ),
-            SizedBox(
-              width: size.width * 0.5,
-              child: Text(
-                productModel.name, // Use productModel.name
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  height: 1.5,
-                  fontFamily: 'Roboto', // Roboto шрифт
-                ),
+                fontFamily: 'Roboto',
               ),
             ),
           ],
         ),
+        const SizedBox(height: 5),
+
+        // Second row: product name (no overflow)
+        SizedBox(
+          width: size.width * 0.5,
+          child: Text(
+            productModel.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              height: 1.5,
+              fontFamily: 'Roboto',
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+
+        // Third row: price, discounted price
         Row(
           children: [
             Text(
-              "\$${productModel.price.toString()}", // Use productModel.price
-              style: TextStyle(
+              "\$${productModel.price.toString()}",
+              style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
                 color: Colors.pink,
                 height: 1.5,
-                fontFamily: 'Roboto', // Roboto шрифт
+                fontFamily: 'Roboto',
               ),
             ),
-            SizedBox(width: 5),
-            if (productModel.isCheck == true) // Use productModel.isCheck
+            const SizedBox(width: 5),
+            if (productModel.isCheck) // Check for discount
               Text(
-                "\$${double.parse(productModel.price) + 255}", // Ensure price calculation is correct
-                style: TextStyle(
+                "\$${(productModel.price * 0.9).toStringAsFixed(2)}", // Assuming discount is 10%
+                style: const TextStyle(
                   color: Colors.black26,
                   decoration: TextDecoration.lineThrough,
                   decorationColor: Colors.black26,
-                  fontFamily: 'Roboto', // Roboto шрифт
+                  fontFamily: 'Roboto',
                 ),
               ),
           ],

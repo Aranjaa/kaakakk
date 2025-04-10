@@ -5,7 +5,7 @@ class Product {
   final int id;
   final String name;
   final String description;
-  final String price;
+  final num price;
   final int stock;
   final String image;
   final Category category;
@@ -39,7 +39,11 @@ class Product {
       description:
           json['description'] ??
           '', // Fallback to empty string if 'description' is null
-      price: json['price'] ?? '0.0', // Fallback to '0.0' if 'price' is null
+      price:
+          (json['price'] != null && json['price'] is String)
+              ? num.tryParse(json['price']) ??
+                  0.0 // Convert string to num or fallback to 0.0
+              : json['price'] ?? 0.0, // If it's already a valid num, use it
       stock: json['stock'] ?? 0, // Fallback to 0 if 'stock' is null
       image: json['image'] ?? '', // Fallback to empty string if 'image' is null
       category: Category.fromJson(

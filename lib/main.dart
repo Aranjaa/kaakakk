@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopping/views/Role_based_login/loginscreen.dart';
+import 'core/Provider/cart_provider.dart';
+import 'core/Provider/FavoriteProvider.dart'; // Provider class
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(
+          create: (_) => FavoriteProvider(),
+        ), // Add FavoriteProvider here
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,9 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Roboto', // Apply Roboto font globally
-      ),
+      theme: ThemeData(fontFamily: 'Roboto'),
       home: const Loginscreen(),
     );
   }

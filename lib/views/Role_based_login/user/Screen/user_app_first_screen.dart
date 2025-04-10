@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping/views/Role_based_login/user/Screen/user_app_home_srceen.dart';
 import 'package:shopping/views/Role_based_login/user/Screen/SearchScreen.dart';
-import 'package:shopping/views/Role_based_login/user/Screen/NotificationScreen.dart';
+import 'package:shopping/views/Role_based_login/user/Screen/FavoriteScreen.dart';
 import 'package:shopping/views/Role_based_login/user/Screen/ProfileScreen.dart';
 
 class UserAppFirstScreen extends StatefulWidget {
@@ -13,11 +13,11 @@ class UserAppFirstScreen extends StatefulWidget {
 
 class _UserAppFirstScreenState extends State<UserAppFirstScreen> {
   int selecedIndex = 0;
-  final List pages = [
-    const AppHomeScreen(),
-    const SearchScreen(),
-    const NotificationScreen(),
-    const ProfileScreen(),
+  final List<Widget> pages = [
+    AppHomeScreen(), // Removed `const` here
+    SearchScreen(), // Removed `const` here
+    FavoriteScreen(), // Removed `const` here
+    ProfileScreen(), // Removed `const` here
   ];
 
   @override
@@ -39,7 +39,7 @@ class _UserAppFirstScreenState extends State<UserAppFirstScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Хайх'),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
-            label: 'Мэдэгдэл',
+            label: 'Надад таалагдсан зүйл',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профайл'),
         ],

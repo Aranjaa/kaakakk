@@ -113,75 +113,76 @@ class _LoginscreenState extends State<Loginscreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Image.asset("assets/2.jpg"),
-              SizedBox(height: 20),
-              TextField(
-                controller: _emailController,
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                ), // Apply Roboto font here
-                decoration: InputDecoration(
-                  labelText: "Майл хаяг",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 15),
-              TextField(
-                controller: _passwordController,
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                ), // Apply Roboto font here
-                decoration: InputDecoration(
-                  labelText: "Нууц үг",
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
-                  child:
-                      _isLoading
-                          ? CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                            "Нэвтэрэх",
-                            style: TextStyle(fontFamily: 'Roboto'),
-                          ),
-                ),
-              ),
-              SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "Бүртгэлгүй юу?",
-                    style: TextStyle(fontSize: 18, fontFamily: 'Roboto'),
+          child: SingleChildScrollView(
+            // <-- Add this
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.asset("assets/2.jpg"),
+                SizedBox(height: 20),
+                TextField(
+                  controller: _emailController,
+                  style: TextStyle(fontFamily: 'Roboto'),
+                  decoration: InputDecoration(
+                    labelText: "Майл хаяг",
+                    border: OutlineInputBorder(),
                   ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => SingUpscreen()),
-                      );
-                    },
-                    child: Text(
-                      "Энд бүртгүүлнэ үү.",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                        letterSpacing: -1,
-                        fontFamily: 'Roboto',
+                ),
+                SizedBox(height: 15),
+                TextField(
+                  controller: _passwordController,
+                  style: TextStyle(fontFamily: 'Roboto'),
+                  decoration: InputDecoration(
+                    labelText: "Нууц үг",
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
+                ),
+                SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleLogin,
+                    child:
+                        _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                              "Нэвтэрэх",
+                              style: TextStyle(fontFamily: 'Roboto'),
+                            ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      "Бүртгэлгүй юу?",
+                      style: TextStyle(fontSize: 18, fontFamily: 'Roboto'),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => SingUpscreen()),
+                        );
+                      },
+                      child: Text(
+                        "Энд бүртгүүлнэ үү.",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                          letterSpacing: -1,
+                          fontFamily: 'Roboto',
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+                SizedBox(height: 20), // Optional: to provide bottom padding
+              ],
+            ),
           ),
         ),
       ),

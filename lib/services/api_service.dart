@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
-import 'package:shopping/core/model/profiles_model.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -236,22 +235,32 @@ class ApiService {
     }
   }
 
-  static Future<UserProfile> fetchUserProfile() async {
+  static Future<List<dynamic>> fetchUserProfile() async {
     try {
+      final token =
+          await getToken(); // Make sure this gets the correct token for the logged-in user
+      final url =
+          '$baseUrl/profiles/'; // Make sure this endpoint returns the current logged-in user profile
+
       final response = await http.get(
-        Uri.parse('$baseUrl/user-profile/'),
+        Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
+          "Authorization": "Bearer $token", // Ensure you're sending the token
         },
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
-        return UserProfile.fromJson(
-          data,
-        ); // Энэ хэсэгт ганц хэрэглэгчийн мэдээллийг буцааж байна
+        _logger.i(
+          "Fetched profile data: $data",
+        ); // Log the fetched data for debugging
+        return data; // Return the profile data
       } else {
+        // Log the error and the URL for debugging
+        _logger.e(
+          "Профайл татахад алдаа гарлаа: ${response.statusCode}, URL: $url",
+        );
         throw Exception("Профайл татахад алдаа гарлаа: ${response.statusCode}");
       }
     } catch (e) {

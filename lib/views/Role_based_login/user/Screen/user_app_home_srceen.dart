@@ -4,10 +4,13 @@ import '../Widgets/banner.dart';
 import '../../../../core/model/category_model.dart';
 import '../../../../core/model/product_model.dart';
 import 'items_detail_screen/screen/items_defail_screen.dart';
-import 'package:iconsax/iconsax.dart';
 import '../../../../services/api_service.dart';
 import 'package:logger/logger.dart';
 import 'category_items.dart';
+// Сагсны дэлгэцээ импортлоорой
+import 'cart_screen.dart'; // ← энэ мөрийг өөрийн замаар тохируул
+import 'package:provider/provider.dart';
+import '../../../../core/Provider/cart_provider.dart';
 
 class AppHomeScreen extends StatefulWidget {
   const AppHomeScreen({super.key});
@@ -79,31 +82,49 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                               fontFamily: 'Roboto',
                             ),
                           ),
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Icon(Iconsax.shopping_bag, size: 28),
-                              Positioned(
-                                right: -3,
-                                top: -5,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      "3",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                          CartScreen(), // Сагс дэлгэц рүү шилжих
+                                ),
+                              );
+                            },
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Icon(Icons.shopping_bag, size: 28),
+                                Positioned(
+                                  right: -3,
+                                  top: -5,
+                                  child: Consumer<CartProvider>(
+                                    builder: (context, cart, child) {
+                                      return cart.totalItems > 0
+                                          ? Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                cart.totalItems.toString(),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                          : const SizedBox.shrink();
+                                    },
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -160,7 +181,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder:
-                                          (_) => CategoryItems(
+                                          (_) => CategoryItem(
                                             category: categories[index].name,
                                             categoryItems: filterItems,
                                             subcategories: [],
