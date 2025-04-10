@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final profileData = await ApiService.fetchUserProfile();
 
       _logger.i(
-        "Профайлын өгөгдөл: $profileData",
+        "Profile data: $profileData",
       ); // Log the profile data for debugging
 
       if (profileData.isNotEmpty) {
@@ -46,11 +46,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           profileData[0],
         ); // Assuming the response is an array
       } else {
-        _logger.e("Профайл олдсонгүй.");
-        throw Exception("Профайл олдсонгүй");
+        _logger.e("No profiles found.");
+        throw Exception("No profiles found");
       }
     } catch (e) {
-      _logger.e("Профайлыг татахад алдаа гарлаа: $e");
+      _logger.e("Error fetching profile: $e");
       rethrow;
     }
   }
@@ -71,11 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Профайл'),
-        elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
+      appBar: AppBar(title: const Text('Профайл')),
       body: FutureBuilder<UserProfile>(
         future: profileFuture,
         builder: (context, snapshot) {
@@ -92,9 +88,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Profile Image Section
                 CircleAvatar(
-                  radius: 70,
+                  radius: 50,
                   backgroundImage:
                       _image != null
                           ? FileImage(_image!)
@@ -122,14 +117,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Profile Details Section
+                // User Profile Info
                 Card(
                   elevation: 5,
                   margin: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -162,7 +153,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-
                 const Spacer(), // Push the logout button to the bottom
                 // Logout Button
                 ElevatedButton(
