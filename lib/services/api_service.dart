@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
 import '../core/model/product_model.dart';
+import '../core/model/wishlists_model.dart';
+import '../core/model/StatusReport.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -204,6 +206,24 @@ class ApiService {
     }
   }
 
+  Future<List<Product>> fetchProducts() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/products/'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        if (data.isNotEmpty) {
+          return data.map((json) => Product.fromJson(json)).toList();
+        } else {
+          throw Exception('Бүтээгдэхүүнүүдийг татахад алдаа гарлаа');
+        }
+      } else {
+        throw Exception('Бүтээгдэхүүнүүдийг татахад алдаа гарлаа');
+      }
+    } catch (e) {
+      throw Exception('Бүтээгдэхүүн татах үед алдаа гарлаа: $e');
+    }
+  }
+
   static Future<List<dynamic>> searchProducts(String query) async {
     try {
       final response = await http.get(
@@ -316,6 +336,231 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Бүтээгдэхүүн устгах: $e');
+    }
+  }
+
+  static Future<bool> addToCart(int productId, int quantity) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/cart/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+        body: jsonEncode({"product_id": productId, "quantity": quantity}),
+      );
+
+      if (response.statusCode == 201) {
+        _logger.i('Сагсанд амжилттай нэмэгдлээ');
+        return true;
+      } else {
+        _logger.e('Сагсанд нэмэх үед алдаа: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _logger.e('Сагсанд нэмэх үед алдаа: $e');
+      return false;
+    }
+  }
+
+  static Future<List<dynamic>> fetchCartItems() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/cart/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        _logger.i('Сагсны мэдээлэл татагдлаа');
+        return data;
+      } else {
+        _logger.e('Сагс татахад алдаа: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('Сагс татахад алдаа: $e');
+      return [];
+    }
+  }
+
+  static Future<bool> removeCartItem(int cartItemId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/cart/$cartItemId/'),
+        headers: {"Authorization": "Bearer ${await getToken()}"},
+      );
+
+      if (response.statusCode == 204) {
+        _logger.i('Сагснаас амжилттай устгагдлаа');
+        return true;
+      } else {
+        _logger.e('Сагснаас устгах үед алдаа: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _logger.e('Сагснаас устгах үед алдаа: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> createOrder(Map<String, dynamic> orderData) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/orders/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+        body: jsonEncode(orderData),
+      );
+
+      if (response.statusCode == 201) {
+        _logger.i('Захиалга амжилттай хийгдлээ');
+        return true;
+      } else {
+        _logger.e('Захиалга хийхэд алдаа: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _logger.e('Захиалга хийхэд алдаа: $e');
+      return false;
+    }
+  }
+
+  static Future<List<dynamic>> fetchOrders() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/orders/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _logger.i('Захиалгууд татагдлаа');
+        return json.decode(utf8.decode(response.bodyBytes));
+      } else {
+        _logger.e('Захиалга татахад алдаа: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('Захиалга татахад алдаа: $e');
+      return [];
+    }
+  }
+
+  static Future<bool> makePayment(int orderId, double amount) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/payments/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+        body: jsonEncode({"order_id": orderId, "amount": amount}),
+      );
+
+      if (response.statusCode == 201) {
+        _logger.i('Төлбөр амжилттай');
+        return true;
+      } else {
+        _logger.e('Төлбөр хийхэд алдаа: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _logger.e('Төлбөр хийхэд алдаа: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> addToWishlist(int productId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/wishlist/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+        body: jsonEncode({"product": productId}),
+      );
+
+      if (response.statusCode == 201) {
+        _logger.i('Бүтээгдэхүүн таалагдсан зүйлд орсон-д нэмэгдлээ');
+        return true;
+      } else {
+        _logger.e('таалагдсан зүйлд нэмэхэд алдаа: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _logger.e('таалагдсан зүйлд нэмэх үед алдаа: $e');
+      return false;
+    }
+  }
+
+  static Future<List<Wishlists>> fetchWishlist() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/wishlist/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${await getToken()}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        return data.map((json) => Wishlists.fromJson(json)).toList();
+      } else {
+        throw Exception('Wishlist fetching failed');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<bool> removeFromWishlist(int wishlistId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/wishlist/$wishlistId/'),
+        headers: {"Authorization": "Bearer ${await getToken()}"},
+      );
+
+      if (response.statusCode == 204) {
+        _logger.i('Таалагдсан зүйлээс амжилттай устгагдлаа');
+        return true;
+      } else {
+        _logger.e(
+          'Таалагдсан зүйлээс устгах үед алдаа: ${response.statusCode}',
+        );
+        return false;
+      }
+    } catch (e) {
+      _logger.e('Таалагдсан зүйлээс устгах үед алдаа: $e');
+      return false;
+    }
+  }
+
+  Future<List<StatusReport>> fetchWeeklyStatusReport() async {
+    final response = await http.get(
+      Uri.parse("http://192.168.99.163:8000/api/reports/weekly-status/"),
+    );
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data.map<StatusReport>((item) {
+        return StatusReport(
+          status: item['status'],
+          period: DateTime.parse(item['week']),
+          totalSales: double.parse(item['total_sales']),
+          totalOrders: item['total_orders'],
+        );
+      }).toList();
+    } else {
+      throw Exception("Report fetch failed");
     }
   }
 }

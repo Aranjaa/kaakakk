@@ -39,7 +39,7 @@ class CuratedItems extends StatelessWidget {
                     color:
                         Provider.of<FavoriteProvider>(
                               context,
-                            ).favoriteItems.contains(productModel)
+                            ).isProductInWishlist(productModel)
                             ? Colors.red
                             : Colors.black26,
                   ),
@@ -48,14 +48,14 @@ class CuratedItems extends StatelessWidget {
                       context,
                       listen: false,
                     );
-                    if (favoriteProvider.favoriteItems.contains(productModel)) {
-                      favoriteProvider.removeFromFavorites(
+                    if (favoriteProvider.isProductInWishlist(productModel)) {
+                      favoriteProvider.removeFromWishlist(
                         productModel,
-                      ); // Remove from favorites
+                      ); // Remove from wishlist
                     } else {
-                      favoriteProvider.addToFavorites(
+                      favoriteProvider.addToWishlist(
                         productModel,
-                      ); // Add to favorites
+                      ); // Add to wishlist
                     }
                   },
                 ),

@@ -3,6 +3,7 @@ import 'package:shopping/services/api_service.dart';
 import 'package:shopping/views/Role_based_login/admin/screen/add_item_screen.dart';
 import './EditProductScreen.dart'; // Add the import for the edit screen
 import 'package:shopping/views/Role_based_login/loginscreen.dart';
+import './ReportScreen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -92,12 +93,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         title: const Text('Админ хуудас'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _handleLogout(context),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -163,6 +158,28 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   );
                 },
               ),
+            ),
+            // Add buttons here for report and logout
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ReportScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Тайлан'),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () => _handleLogout(context),
+                  child: const Text('Лог-аут'),
+                ),
+              ],
             ),
           ],
         ),

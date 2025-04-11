@@ -23,7 +23,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
 
   void _addToCart() {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    cartProvider.addToCart(widget.productModel);
+    cartProvider.addToCart(widget.productModel); // Pass the quantity as well
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Бүтээгдэхүүн картанд нэмэгдлээ!')),
@@ -168,7 +168,7 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                           color:
                               Provider.of<FavoriteProvider>(
                                     context,
-                                  ).favoriteItems.contains(widget.productModel)
+                                  ).isProductInWishlist(widget.productModel)
                                   ? Colors.red
                                   : Colors.black26,
                         ),
@@ -178,16 +178,16 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
                                 context,
                                 listen: false,
                               );
-                          if (favoriteProvider.favoriteItems.contains(
+                          if (favoriteProvider.isProductInWishlist(
                             widget.productModel,
                           )) {
-                            favoriteProvider.removeFromFavorites(
+                            favoriteProvider.removeFromWishlist(
                               widget.productModel,
-                            ); // Таалагдсан бүтээгдэхүүнийг хасах
+                            ); // Remove from wishlist
                           } else {
-                            favoriteProvider.addToFavorites(
+                            favoriteProvider.addToWishlist(
                               widget.productModel,
-                            ); // Таалагдсан бүтээгдэхүүнд нэмэх
+                            ); // Add to wishlist
                           }
                         },
                       ),
