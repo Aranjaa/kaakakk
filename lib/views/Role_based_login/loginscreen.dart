@@ -73,15 +73,15 @@ class _LoginscreenState extends State<Loginscreen> {
           _showErrorDialog('Нэвтэрэх үед алдаа гарлаа!');
         }
 
-        _logger.i('Нэвтэрэх амжилттай');
+        _logger.i('Нэвтрэх амжилттай');
       } else {
         // Handle login failure
         _logger.e('Нэвтэрч чадсангүй: ${response.body}');
-        _showErrorDialog('Нэвтэрэх үед алдаа гарлаа!');
+        _showErrorDialog('Нэвтрэх үед алдаа гарлаа!');
       }
     } catch (e) {
-      _logger.e('Нэвтэрэх үед алдаа гарлаа: $e');
-      _showErrorDialog('Нэвтэрэх үед алдаа гарлаа!');
+      _logger.e('Нэвтрэх үед алдаа гарлаа: $e');
+      _showErrorDialog('Нэвтрэх үед алдаа гарлаа!');
     } finally {
       setState(() {
         _isLoading = false;
@@ -147,7 +147,7 @@ class _LoginscreenState extends State<Loginscreen> {
                         _isLoading
                             ? CircularProgressIndicator(color: Colors.white)
                             : Text(
-                              "Нэвтэрэх",
+                              "Нэвтрэх",
                               style: TextStyle(fontFamily: 'Roboto'),
                             ),
                   ),

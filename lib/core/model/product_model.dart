@@ -33,40 +33,49 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
+    num parsedPrice;
+    // Хэрэв price талбар нь null бол 0.0
+    if (json['price'] == null) {
+      parsedPrice = 0.0;
+    } else if (json['price'] is String) {
+      // Хэрэв "price" string хэлбэртэй бол хөрвүүлнэ
+      parsedPrice = num.tryParse(json['price']) ?? 0.0;
+    } else if (json['price'] is num) {
+      // Хэрэв харьцангуй тоон утга бол шууд авна
+      parsedPrice = json['price'];
+    } else {
+      parsedPrice = 0.0;
+    }
+
+    // rating талбарын хувьд ижил арга хэрэглэж болно, хэрэв шаардлагатай бол
+    double parsedRating;
+    if (json['rating'] == null) {
+      parsedRating = 0.0;
+    } else if (json['rating'] is String) {
+      parsedRating = double.tryParse(json['rating']) ?? 0.0;
+    } else if (json['rating'] is num) {
+      parsedRating = (json['rating'] as num).toDouble();
+    } else {
+      parsedRating = 0.0;
+    }
+
     return Product(
-      id: json['id'] ?? 0, // Fallback to 0 if 'id' is null
-      name: json['name'] ?? '', // Fallback to empty string if 'name' is null
-      description:
-          json['description'] ??
-          '', // Fallback to empty string if 'description' is null
-      price:
-          (json['price'] != null && json['price'] is String)
-              ? num.tryParse(json['price']) ??
-                  0.0 // Convert string to num or fallback to 0.0
-              : json['price'] ?? 0.0, // If it's already a valid num, use it
-      stock: json['stock'] ?? 0, // Fallback to 0 if 'stock' is null
-      image: json['image'] ?? '', // Fallback to empty string if 'image' is null
-      category: Category.fromJson(
-        json['category'] ?? {},
-      ), // Ensure category is not null
-      subcategory: Subcategory.fromJson(
-        json['subcategory'] ?? {},
-      ), // Ensure subcategory is not null
-      rating:
-          (json['rating'] != null && json['rating'] is double)
-              ? json['rating'].toDouble()
-              : 0.0, // Ensure rating is a valid double
-      reviews: json['reviews'] ?? 0, // Fallback to 0 if 'reviews' is null
-      isCheck:
-          json['isCheck'] ?? false, // Fallback to false if 'isCheck' is null
-      color: List<String>.from(
-        json['color'] ?? [],
-      ), // Fallback to empty list if 'color' is null
-      size: List<String>.from(
-        json['size'] ?? [],
-      ), // Fallback to empty list if 'size' is null
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      price: parsedPrice,
+      stock: json['stock'] ?? 0,
+      image: json['image'] ?? '',
+      category: Category.fromJson(json['category'] ?? {}),
+      subcategory: Subcategory.fromJson(json['subcategory'] ?? {}),
+      rating: parsedRating,
+      reviews: json['reviews'] ?? 0,
+      isCheck: json['isCheck'] ?? false,
+      color: List<String>.from(json['color'] ?? []),
+      size: List<String>.from(json['size'] ?? []),
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -75,9 +84,8 @@ class Product {
       'price': price,
       'stock': stock,
       'image': image,
-      'category': category.toJson(), // Assuming Category class has toJson
-      'subcategory':
-          subcategory.toJson(), // Assuming Subcategory class has toJson
+      'category': category.toJson(),
+      'subcategory': subcategory.toJson(),
       'rating': rating,
       'reviews': reviews,
       'isCheck': isCheck,

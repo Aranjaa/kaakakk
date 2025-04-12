@@ -8,7 +8,7 @@ import '../core/model/StatusReport.dart';
 
 class ApiService {
   static const String baseUrl =
-      'http://192.168.99.163:8000/api'; // Local IP for Android device
+      'http://192.168.1.4:8000/api'; // Local IP for Android device
   static final Logger _logger = Logger(); // Logger instance for logging
 
   // Login function
@@ -547,7 +547,7 @@ class ApiService {
 
   Future<List<StatusReport>> fetchWeeklyStatusReport() async {
     final response = await http.get(
-      Uri.parse("http://192.168.99.163:8000/api/reports/weekly-status/"),
+      Uri.parse("http://192.168.1.4:8000/api/reports/weekly-status/"),
     );
     if (response.statusCode == 200) {
       final data = json.decode(response.body);

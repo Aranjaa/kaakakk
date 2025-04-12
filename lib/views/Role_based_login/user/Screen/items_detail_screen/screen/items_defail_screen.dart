@@ -5,6 +5,7 @@ import '../../../../../../core/model/product_model.dart';
 import '../../../../../../core/Provider/cart_provider.dart';
 import '../../../../../../core/Provider/FavoriteProvider.dart';
 import '../../cart_screen.dart'; // Import CartScreen
+import '../../BuyNowScreen.dart';
 
 class ItemsDefailScreen extends StatefulWidget {
   final Product productModel;
@@ -31,8 +32,17 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
   }
 
   void _buyNow() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Худалдаж авах хэсэг рүү шилжиж байна...')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => BuyNowScreen(
+              productId: widget.productModel.id,
+              price: widget.productModel.price.toDouble(), // <- Энэ хэсэг чухал
+              quantity: 1,
+              method: 'Бэлнээр',
+            ),
+      ),
     );
   }
 

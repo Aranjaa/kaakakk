@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../model/add_item_model.dart';
 
 class ApiController {
-  final String baseUrl = 'http://192.168.99.163:8000/api';
+  final String baseUrl = 'http://192.168.1.4:8000/api';
 
   // Fetch categories
   Future<List<Category>> fetchCategories() async {

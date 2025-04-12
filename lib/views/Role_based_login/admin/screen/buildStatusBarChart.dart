@@ -1,32 +1,56 @@
-import 'package:charts_flutter/flutter.dart' as charts;
-import '../../../../core/model/StatusReport.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/model/StatusReport.dart';
 
 Widget buildStatusBarChart(List<StatusReport> data) {
-  final grouped = <String, List<StatusReport>>{};
+  // Өдрөөр бүлэглэх
+  final grouped = <String, double>{};
   for (var report in data) {
-    grouped.putIfAbsent(report.status, () => []).add(report);
+    final key = "${report.period.month}/${report.period.day}";
+    grouped[key] = (grouped[key] ?? 0) + report.totalSales;
   }
 
-  final List<charts.Series<StatusReport, String>> seriesList =
-      grouped.entries.map((entry) {
-        return charts.Series<StatusReport, String>(
-          id: entry.key,
-          domainFn: (StatusReport r, _) => "${r.period.month}/${r.period.day}",
-          measureFn: (StatusReport r, _) => r.totalSales,
-          data: entry.value,
-          labelAccessorFn:
-              (StatusReport r, _) => r.totalSales.toStringAsFixed(0),
+  final barGroups =
+      grouped.entries.toList().asMap().entries.map((entry) {
+        final index = entry.key;
+        final e = entry.value;
+        return BarChartGroupData(
+          x: index,
+          barRods: [
+            BarChartRodData(
+              toY: e.value,
+              color: Colors.blue,
+              width: 16,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ],
         );
       }).toList();
 
   return SizedBox(
     height: 300,
-    child: charts.BarChart(
-      seriesList,
-      animate: true,
-      barGroupingType: charts.BarGroupingType.grouped,
-      behaviors: [charts.SeriesLegend()],
+    child: BarChart(
+      BarChartData(
+        barGroups: barGroups,
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, _) {
+                if (value < grouped.length) {
+                  return Text(
+                    grouped.keys.elementAt(value.toInt()),
+                    style: TextStyle(fontSize: 10),
+                  );
+                }
+                return Text('');
+              },
+            ),
+          ),
+          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
+        ),
+        borderData: FlBorderData(show: false),
+      ),
     ),
   );
 }
