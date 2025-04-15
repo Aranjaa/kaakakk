@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shopping/views/Role_based_login/loginscreen.dart';
+import 'package:shopping/views/home.dart';
 import 'core/Provider/cart_provider.dart';
 import 'core/Provider/FavoriteProvider.dart'; // Provider class
 
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Roboto'),
-      home: const Loginscreen(),
+      home: const HomeScren(),
     );
   }
 }

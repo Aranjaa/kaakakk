@@ -40,7 +40,6 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
               productId: widget.productModel.id,
               price: widget.productModel.price.toDouble(), // <- Энэ хэсэг чухал
               quantity: 1,
-              method: 'Бэлнээр',
             ),
       ),
     );

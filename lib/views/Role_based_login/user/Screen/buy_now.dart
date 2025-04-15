@@ -21,7 +21,7 @@ Future<void> buyNow({
     return;
   }
 
-  final url = Uri.parse("http://192.168.1.4:8000/api/orders/create/");
+  final url = Uri.parse("http://192.168.99.163:8000/api/orders/create/");
   final body = {
     "status": "pending",
     "total_price": (price * quantity).toString(),

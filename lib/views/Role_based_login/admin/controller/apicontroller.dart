@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/add_item_model.dart';
+import 'package:logger/logger.dart';
 
 class ApiController {
-  final String baseUrl = 'http://192.168.1.4:8000/api';
+  final String baseUrl = 'http://192.168.99.163:8000/api';
 
   // Fetch categories
   Future<List<Category>> fetchCategories() async {
@@ -100,5 +101,63 @@ class ApiController {
     } catch (e) {
       throw Exception('Бүтээгдэхүүн нэмэх: $e');
     }
+  }
+
+  Future<void> addToCart(int productId, int quantity) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/cart-items/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'product': productId, 'quantity': quantity}),
+    );
+    Logger().i('Add to cart: ${response.statusCode} - ${response.body}');
+  }
+
+  Future<void> createOrder(Map<String, dynamic> orderData) async {
+    final body = {
+      "shipping_address": {
+        "country":
+            orderData['country'], // orderData-оос country утгыг авч байна
+        "city": orderData['city'], // orderData-оос city утгыг авч байна
+        "street": orderData['street'], // orderData-оос street утгыг авч байна
+        "postal_code":
+            orderData['postalCode'], // orderData-оос postalCode утгыг авч байна
+      },
+      "items": orderData['items'], // items-ийг orderData-аас авч байна
+    };
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/orders/create/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+
+    Logger().i('Create order: ${response.statusCode} - ${response.body}');
+  }
+
+  Future<void> makePayment({
+    required int orderId,
+    required double amount,
+    required String method,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/payments/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "order": orderId,
+        "amount": amount,
+        "payment_method": method,
+        "status": "paid",
+      }),
+    );
+    Logger().i('Payment: ${response.statusCode} - ${response.body}');
+  }
+
+  Future<void> addToWishlist(int productId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/wishlists/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({"product": productId}),
+    );
+    Logger().i('Wishlist: ${response.statusCode} - ${response.body}');
   }
 }

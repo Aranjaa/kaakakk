@@ -11,6 +11,7 @@ import 'category_items.dart';
 import 'cart_screen.dart'; // ← энэ мөрийг өөрийн замаар тохируул
 import 'package:provider/provider.dart';
 import '../../../../core/Provider/cart_provider.dart';
+import '../../loginscreen.dart';
 
 class AppHomeScreen extends StatefulWidget {
   const AppHomeScreen({super.key});
@@ -33,8 +34,14 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
 
   Future<void> _fetchData() async {
     try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Хэрвээ токен байхгүй эсвэл хугацаа дууссан бол категорийн болон бүтээгдэхүүний мэдээллийг ямар ч тохиолдолд авахыг оролдох
       List<Map<String, dynamic>> fetchedCategories =
           List<Map<String, dynamic>>.from(await ApiService.fetchCategories());
+
       List<Map<String, dynamic>> fetchedProducts =
           List<Map<String, dynamic>>.from(await ApiService.getProducts());
 
@@ -54,6 +61,25 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
       setState(() {
         _isLoading = false;
       });
+
+      // Хэрвээ токен буруу эсвэл хугацаа дууссан бол хэрэглэгчийг нэвтрүүлэх
+      if (e.toString().contains('Токен алдаатай эсвэл хугацаа дууссан')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Токен алдаатай эсвэл хугацаа дууссан. Нэвтэрнэ үү.'),
+          ),
+        );
+
+        // Нэвтрэх дэлгэц рүү шилжих
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => Loginscreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Алдаа гарлаа: $e')));
+      }
     }
   }
 
@@ -86,11 +112,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) =>
-                                          CartScreen(), // Сагс дэлгэц рүү шилжих
-                                ),
+                                MaterialPageRoute(builder: (_) => CartScreen()),
                               );
                             },
                             child: Stack(
@@ -131,33 +153,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                     ),
                     const SizedBox(height: 20),
                     const MyBanner(),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Ангилал",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Roboto',
-                            ),
-                          ),
-                          Text(
-                            "Бүгдийг харах",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black45,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Ангилал харах хэсэг
                     categories.isEmpty
                         ? const Center(child: Text("Ангилал олдсонгүй"))
                         : SingleChildScrollView(
@@ -209,6 +205,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
                             }),
                           ),
                         ),
+                    // Бүтээгдэхүүн харах хэсэг
                     const Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 20,

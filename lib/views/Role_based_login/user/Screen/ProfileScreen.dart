@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping/services/api_service.dart';
-import 'package:shopping/core/model/profiles_model.dart';
+import '../../../../core/model/user_profile_model.dart';
 import 'package:logger/logger.dart';
-import 'package:image_picker/image_picker.dart'; // Add this import for image picking
-import 'dart:io'; // To handle image files
-import 'package:shopping/views/Role_based_login/loginscreen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,55 +13,21 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late Future<UserProfile> profileFuture;
   final _logger = Logger();
-  File? _image;
 
   @override
   void initState() {
     super.initState();
-    profileFuture = _fetchUserProfile(); // Fetch user profile on screen load
-  }
-
-  Future<void> _handleLogout(BuildContext context) async {
-    await ApiService.logout();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Loginscreen()),
-    );
+    profileFuture = _fetchUserProfile(); // Хэрэглэгчийн профайлыг татах
   }
 
   Future<UserProfile> _fetchUserProfile() async {
     try {
-      // Fetch the logged-in user's profile
       final profileData = await ApiService.fetchUserProfile();
-
-      _logger.i(
-        "Profile data: $profileData",
-      ); // Log the profile data for debugging
-
-      if (profileData.isNotEmpty) {
-        return UserProfile.fromJson(
-          profileData[0],
-        ); // Assuming the response is an array
-      } else {
-        _logger.e("No profiles found.");
-        throw Exception("No profiles found");
-      }
+      _logger.i("Profile data: $profileData");
+      return profileData;
     } catch (e) {
       _logger.e("Error fetching profile: $e");
       rethrow;
-    }
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
     }
   }
 
@@ -90,34 +53,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage:
-                      _image != null
-                          ? FileImage(_image!)
-                          : NetworkImage(profile.profilePicture)
-                              as ImageProvider,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _pickImage,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    backgroundColor:
-                        Theme.of(context).primaryColor, // Set background color
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: const Text(
-                    'Зураг сонгох',
-                    style: TextStyle(fontSize: 16),
+                  backgroundImage: NetworkImage(
+                    profile.profilePicture ?? 'https://default_image.com',
                   ),
                 ),
                 const SizedBox(height: 16),
-                // User Profile Info
                 Card(
                   elevation: 5,
                   margin: const EdgeInsets.symmetric(vertical: 8),
@@ -153,25 +93,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                const Spacer(), // Push the logout button to the bottom
-                // Logout Button
                 ElevatedButton(
-                  onPressed: () => _handleLogout(context),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    backgroundColor: Colors.redAccent, // Red color for logout
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: const Text(
-                    'Гарах',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  onPressed: () async {
+                    await ApiService.logout(); // Токен болон хэрэглэгчийн мэдээллийг цэвэрлэх
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: const Text('Гарах'),
                 ),
               ],
             ),

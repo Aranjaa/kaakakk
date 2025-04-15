@@ -5,10 +5,11 @@ import 'package:logger/logger.dart';
 import '../core/model/product_model.dart';
 import '../core/model/wishlists_model.dart';
 import '../core/model/StatusReport.dart';
+import '../core/model/user_profile_model.dart';
 
 class ApiService {
   static const String baseUrl =
-      'http://192.168.1.4:8000/api'; // Local IP for Android device
+      'http://192.168.99.163:8000/api'; // Local IP for Android device
   static final Logger _logger = Logger(); // Logger instance for logging
 
   // Login function
@@ -20,23 +21,23 @@ class ApiService {
         body: jsonEncode({"email": email, "password": password}),
       );
 
-      // Check if the response is successful
       if (response.statusCode == 200) {
         _logger.i('Нэвтрэлт амжилттай');
-        _logger.i('Response body: ${response.body}'); // Simplified logging
 
-        // Decode the response to get the token
-        final responseData = json.decode(response.body);
+        // UTF-8 ашиглан JSON задлах
+        final responseData = json.decode(utf8.decode(response.bodyBytes));
+        _logger.i('Response body: $responseData');
+
         final String token = responseData['token'];
 
-        // Save the token to SharedPreferences for future requests
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
 
         return response;
       } else {
+        final error = utf8.decode(response.bodyBytes);
         _logger.e('Нэвтрэх үед алдаа гарлаа: ${response.statusCode}');
-        _logger.e('Response body: ${response.body}');
+        _logger.e('Response body: $error');
         throw Exception('Нэвтрэх үед алдаа гарлаа: ${response.statusCode}');
       }
     } catch (e) {
@@ -66,18 +67,14 @@ class ApiService {
         }),
       );
 
-      // Check if the response is successful
       if (response.statusCode == 201) {
-        _logger.i('Хэрэглэгч амжилттай бүртгүүлэв');
-        _logger.i('Response body: ${response.body}'); // Simplified logging
+        final responseData = json.decode(utf8.decode(response.bodyBytes));
+        _logger.i('Хэрэглэгч амжилттай бүртгүүлэв: $responseData');
       } else {
-        _logger.e(
-          'Хэрэглэгч бүртгүүлэх үед алдаа гарлаа: ${response.statusCode}',
-        );
-        _logger.e('Response body: ${response.body}');
-        throw Exception(
-          'Хэрэглэгч бүртгүүлэх үед алдаа гарлаа: ${response.statusCode}',
-        );
+        final error = utf8.decode(response.bodyBytes);
+        _logger.e('Бүртгэх үед алдаа гарлаа: ${response.statusCode}');
+        _logger.e('Response body: $error');
+        throw Exception('Бүртгэх үед алдаа гарлаа: ${response.statusCode}');
       }
 
       return response;
@@ -90,31 +87,55 @@ class ApiService {
   // Function to fetch categories
   static Future<List<Map<String, dynamic>>> fetchCategories() async {
     try {
+      String? token;
+      try {
+        token = await getToken();
+      } catch (e) {
+        _logger.w('⚠️ Token байхгүй. Зочин хэрэглэгч гэж үзэв.');
+        // Зочин хэрэглэгчийн ангилал авах
+        final response = await http.get(
+          Uri.parse(
+            '$baseUrl/categories/?guest=true',
+          ), // Зочин хэрэглэгчийн хувьд параметр нэмэх
+        );
+
+        if (response.statusCode == 200) {
+          _logger.i('✅ Ангилал амжилттай татагдлаа');
+          final List<dynamic> data = json.decode(
+            utf8.decode(response.bodyBytes),
+          );
+          return List<Map<String, dynamic>>.from(data);
+        } else {
+          _logger.e('⛔ Ангилал татахад алдаа гарлаа: ${response.statusCode}');
+          throw Exception(
+            'Ангилал татахад алдаа гарлаа: ${response.statusCode}',
+          );
+        }
+      }
+
+      final headers = {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      };
+
       final response = await http.get(
         Uri.parse('$baseUrl/categories/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
-        _logger.i('Ангилал амжилттай татагдлаа');
-        // UTF-8 кодчилол ашиглаж текст задлах
+        _logger.i('✅ Ангилал амжилттай татагдлаа');
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return List<Map<String, dynamic>>.from(data);
       } else if (response.statusCode == 401) {
-        _logger.e('Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон');
-        throw Exception(
-          'Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон',
-        );
+        _logger.e('⛔ Токен алдаатай эсвэл хугацаа дууссан');
+        throw Exception('Токен алдаатай эсвэл хугацаа дууссан');
       } else {
-        _logger.e('Ангилал татахад алдаа гарлаа: ${response.statusCode}');
-        _logger.e('Response body: ${response.body}');
+        _logger.e('⛔ Ангилал татахад алдаа гарлаа: ${response.statusCode}');
         throw Exception('Ангилал татахад алдаа гарлаа: ${response.statusCode}');
       }
     } catch (e) {
-      _logger.e('Ангилал татахад алдаа гарлаа: $e');
+      _logger.e('⛔ Ангилал татахад алдаа гарлаа: $e');
       rethrow;
     }
   }
@@ -122,33 +143,35 @@ class ApiService {
   // Function to fetch subcategories
   static Future<List<Map<String, dynamic>>> fetchSubcategories() async {
     try {
+      String? token;
+      try {
+        token = await getToken();
+      } catch (e) {
+        _logger.w('⚠️ Token байхгүй. Зочин хэрэглэгч гэж үзэв.');
+      }
+
+      final headers = {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      };
+
       final response = await http.get(
         Uri.parse('$baseUrl/subcategories/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
-        _logger.i('Дэд ангилал амжилттай татагдлаа');
-        // UTF-8 кодчилол ашиглаж текст задлах
+        _logger.i('✅ Дэд ангилал амжилттай татагдлаа');
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return List<Map<String, dynamic>>.from(data);
-      } else if (response.statusCode == 401) {
-        _logger.e('Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон');
-        throw Exception(
-          'Зөвшөөрөлгүй: Токен хугацаа дууссан эсвэл хүчингүй болсон',
-        );
       } else {
-        _logger.e('Дэд ангилал татахад алдаа гарлаа: ${response.statusCode}');
-        _logger.e('Response body: ${response.body}');
+        _logger.e('⛔ Дэд ангилал татахад алдаа гарлаа: ${response.statusCode}');
         throw Exception(
           'Дэд ангилал татахад алдаа гарлаа: ${response.statusCode}',
         );
       }
     } catch (e) {
-      _logger.e('Дэд ангилал татахад алдаа гарлаа: $e');
+      _logger.e('⛔ Дэд ангилал татахад алдаа гарлаа: $e');
       rethrow;
     }
   }
@@ -159,13 +182,14 @@ class ApiService {
     return prefs.getString('token');
   }
 
-  // Function to check if user is logged in
+  // Хэрэглэгч нэвтэрсэн эсэхийг шалгах
   static Future<bool> isLoggedIn() async {
     final token = await getToken();
-    return token != null && token.isNotEmpty;
+    return token != null &&
+        token.isNotEmpty; // Хэрэв token байгаа бол хэрэглэгч нэвтэрсэн гэж үзнэ
   }
 
-  // Logout function
+  // Хэрэглэгчийг гарах үйлдэл (logout) хийх
   static Future<void> logout() async {
     try {
       // Remove the token from SharedPreferences
@@ -181,27 +205,36 @@ class ApiService {
 
   static Future<List<dynamic>> getProducts() async {
     try {
+      // Token авна (байхгүй байж болно)
+      String? token;
+      try {
+        token = await getToken();
+      } catch (e) {
+        _logger.w('⚠️ Token байхгүй байна. Зочин хэрэглэгч гэж үзэв.');
+      }
+
+      final headers = {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      };
+
       final response = await http.get(
         Uri.parse('$baseUrl/products/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
-        _logger.i('Бүтээгдэхүүнүүд амжилттай татагдлаа');
-        // UTF-8 кодчилол ашиглаж текст задлах
+        _logger.i('✅ Бүтээгдэхүүнүүд амжилттай татагдлаа');
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        return data; // Бүтээгдэхүүнүүдийг буцаах
+        return data;
       } else {
         _logger.e(
-          'Бүтээгдэхүүнүүдийг татахад алдаа гарлаа: ${response.statusCode}',
+          '⛔ Бүтээгдэхүүнүүдийг татахад алдаа гарлаа: ${response.statusCode}',
         );
         throw Exception('Бүтээгдэхүүнүүдийг татахад алдаа гарлаа');
       }
     } catch (e) {
-      _logger.e('Бүтээгдэхүүн татах үед алдаа гарлаа: $e');
+      _logger.e('⛔ Бүтээгдэхүүн татах үед алдаа гарлаа: $e');
       rethrow;
     }
   }
@@ -209,12 +242,13 @@ class ApiService {
   Future<List<Product>> fetchProducts() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/products/'));
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         if (data.isNotEmpty) {
           return data.map((json) => Product.fromJson(json)).toList();
         } else {
-          throw Exception('Бүтээгдэхүүнүүдийг татахад алдаа гарлаа');
+          return [];
         }
       } else {
         throw Exception('Бүтээгдэхүүнүүдийг татахад алдаа гарлаа');
@@ -226,18 +260,26 @@ class ApiService {
 
   static Future<List<dynamic>> searchProducts(String query) async {
     try {
+      String? token;
+      try {
+        token = await getToken();
+      } catch (e) {
+        _logger.w('⚠️ Token байхгүй. Зочин хайлт хийж байна.');
+      }
+
+      final headers = {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      };
+
       final response = await http.get(
         Uri.parse('$baseUrl/products/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
 
-        // Нэрээр хайж шүүх
         final List<dynamic> filtered =
             data.where((product) {
               final productName =
@@ -247,45 +289,44 @@ class ApiService {
 
         return filtered;
       } else {
-        _logger.e('Хайлтын үед алдаа гарлаа: ${response.statusCode}');
+        _logger.e('⛔ Хайлтын үед алдаа гарлаа: ${response.statusCode}');
         throw Exception('Хайлтын үед алдаа гарлаа');
       }
     } catch (e) {
-      _logger.e('Хайлтын үед алдаа гарлаа: $e');
+      _logger.e('⛔ Хайлтын үед алдаа гарлаа: $e');
       rethrow;
     }
   }
 
-  static Future<List<dynamic>> fetchUserProfile() async {
+  static Future<UserProfile> fetchUserProfile() async {
     try {
-      final token =
-          await getToken(); // Make sure this gets the correct token for the logged-in user
-      final url =
-          '$baseUrl/profiles/'; // Make sure this endpoint returns the current logged-in user profile
+      final token = await getToken(); // Хэрэглэгчийн токеныг авах
+      final url = '$baseUrl/profiles/'; // API эндпоинт
 
       final response = await http.get(
         Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $token", // Ensure you're sending the token
+          "Authorization":
+              "Bearer $token", // Токен зөв ирж байгаа эсэхийг шалгах
         },
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
-        _logger.i(
-          "Fetched profile data: $data",
-        ); // Log the fetched data for debugging
-        return data; // Return the profile data
+
+        // Хэрэглэгчийн профайлыг авч оруулна
+        if (data.isNotEmpty) {
+          return UserProfile.fromJson(
+            data[0],
+          ); // Тус бүрийн хэрэглэгчийн профайл
+        } else {
+          throw Exception("Profile not found");
+        }
       } else {
-        // Log the error and the URL for debugging
-        _logger.e(
-          "Профайл татахад алдаа гарлаа: ${response.statusCode}, URL: $url",
-        );
-        throw Exception("Профайл татахад алдаа гарлаа: ${response.statusCode}");
+        throw Exception("Error fetching profile: ${response.statusCode}");
       }
     } catch (e) {
-      _logger.e("Профайл татах үед алдаа: $e");
       rethrow;
     }
   }
@@ -339,13 +380,53 @@ class ApiService {
     }
   }
 
+  static Future<List<dynamic>> fetchCartItems() async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        _logger.e('⛔ Token олдсонгүй. Хэрэглэгч дахин нэвтрэх шаардлагатай.');
+        // TODO: Login page рүү navigate хийх логик нэмэж болно
+        return [];
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/cart/'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        _logger.i('✅ Сагсны мэдээлэл татагдлаа');
+        return data;
+      } else if (response.statusCode == 401) {
+        _logger.e('⛔ Token хүчингүй. Нэвтрэх шаардлагатай.');
+        // TODO: Token устгах ба login page рүү шилжүүлэх боломжтой
+        return [];
+      } else {
+        _logger.e('❌ Сагс татахад алдаа: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('🚨 Сагс татах үед алдаа: $e');
+      return [];
+    }
+  }
+
   static Future<bool> addToCart(int productId, int quantity) async {
     try {
+      final token = await getToken();
+      if (token == null || token.isEmpty) {
+        throw 'Token not found';
+      }
+
       final response = await http.post(
         Uri.parse('$baseUrl/cart/'),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
+          "Authorization": "Bearer $token",
         },
         body: jsonEncode({"product_id": productId, "quantity": quantity}),
       );
@@ -363,70 +444,46 @@ class ApiService {
     }
   }
 
-  static Future<List<dynamic>> fetchCartItems() async {
+  static Future<bool> removeCartItem(int itemId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/cart/'),
+      final response = await http.delete(
+        Uri.parse('$baseUrl/cart/$itemId/'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer ${await getToken()}",
         },
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes));
-        _logger.i('Сагсны мэдээлэл татагдлаа');
-        return data;
-      } else {
-        _logger.e('Сагс татахад алдаа: ${response.statusCode}');
-        return [];
-      }
-    } catch (e) {
-      _logger.e('Сагс татахад алдаа: $e');
-      return [];
-    }
-  }
-
-  static Future<bool> removeCartItem(int cartItemId) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/cart/$cartItemId/'),
-        headers: {"Authorization": "Bearer ${await getToken()}"},
-      );
-
       if (response.statusCode == 204) {
-        _logger.i('Сагснаас амжилттай устгагдлаа');
+        _logger.i('Сагснаас бүтээгдэхүүн амжилттай устгагдлаа');
         return true;
       } else {
-        _logger.e('Сагснаас устгах үед алдаа: ${response.statusCode}');
+        _logger.e(
+          'Сагснаас бүтээгдэхүүн устгах үед алдаа: ${response.statusCode}',
+        );
         return false;
       }
     } catch (e) {
-      _logger.e('Сагснаас устгах үед алдаа: $e');
+      _logger.e('Сагснаас бүтээгдэхүүн устгах үед алдаа: $e');
       return false;
     }
   }
 
   static Future<bool> createOrder(Map<String, dynamic> orderData) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/orders/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
-        },
-        body: jsonEncode(orderData),
-      );
+    final token = await getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/orders/create/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(orderData),
+    );
 
-      if (response.statusCode == 201) {
-        _logger.i('Захиалга амжилттай хийгдлээ');
-        return true;
-      } else {
-        _logger.e('Захиалга хийхэд алдаа: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      _logger.e('Захиалга хийхэд алдаа: $e');
+    if (response.statusCode == 201) {
+      return true;
+    } else {
+      _logger.e('Order failed: ${response.body}');
       return false;
     }
   }
@@ -547,7 +604,7 @@ class ApiService {
 
   Future<List<StatusReport>> fetchWeeklyStatusReport() async {
     final response = await http.get(
-      Uri.parse("http://192.168.1.4:8000/api/reports/weekly-status/"),
+      Uri.parse("http://192.168.99.163:8000/api/reports/weekly-status/"),
     );
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
