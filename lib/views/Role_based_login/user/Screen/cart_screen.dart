@@ -74,14 +74,40 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   // Fetch cart items if token is available
-  void _fetchCartItems() async {
+  // Assuming you're trying to parse a list of cart items
+  Future<void> _fetchCartItems() async {
     String? token = await _getToken();
     if (token != null) {
-      List<CartItem> items = await ApiService.fetchCartItems(token);
-      setState(() {
-        _cartItems = items;
-        _calculateTotal(); // Calculate total price
-      });
+      List<CartItem> items = [];
+      try {
+        // Fetch the cart items from the API
+        final response =
+            await ApiService.fetchCartItems(token); // Your API call method
+        print('Cart API Response: $response'); // Log the raw response
+
+        // Ensure that the response is a List of Maps
+        if (response is List) {
+          for (var itemJson in response) {
+            // Ensure each item is a Map<String, dynamic>
+            if (itemJson is Map<String, dynamic>) {
+              // Convert Map<String, dynamic> to CartItem
+              items.add(CartItem.fromJson(itemJson)); // This is correct
+            } else {
+              _logger.e("Expected Map<String, dynamic> but found: $itemJson");
+            }
+          }
+
+          // Update state with the fetched cart items
+          setState(() {
+            _cartItems = items;
+            _calculateTotal(); // Calculate total price
+          });
+        } else {
+          _logger.e('Expected a list but got: $response');
+        }
+      } catch (e) {
+        _logger.e("Error parsing cart items: $e");
+      }
     } else {
       _logger.e('❗ Token олдсонгүй');
     }

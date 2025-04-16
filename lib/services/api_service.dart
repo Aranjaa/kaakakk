@@ -380,12 +380,10 @@ class ApiService {
   }
 
   static Future<List<CartItem>> fetchCartItems(String token) async {
-    final baseUrl =
-        'http://192.168.99.163:8000'; // Ensure this is the correct base URL
-    final url =
-        '$baseUrl/api/cart/'; // This should now be http://192.168.99.163:8000/api/cart/
+    final baseUrl = 'http://192.168.99.163:8000';
+    final url = '$baseUrl/api/cart/';
 
-    _logger.i('Request URL: $url'); // Check if the URL is correct
+    _logger.i('Request URL: $url');
 
     final response = await http.get(
       Uri.parse(url),
@@ -397,27 +395,33 @@ class ApiService {
         final decoded = json.decode(response.body);
 
         if (decoded is List) {
-          return decoded
-              .map<CartItem>((item) => CartItem.fromJson(item))
-              .toList();
+          return decoded.map<CartItem>((item) {
+            int productId = item['product_id'] ?? 0; // Default to 0 if null
+            int quantity = item['quantity'] ?? 1; // Default to 1 if null
+            return CartItem.fromJson({
+              'product_id': productId,
+              'quantity': quantity,
+            });
+          }).toList();
         }
 
         if (decoded is Map && decoded['items'] is List) {
-          return (decoded['items'] as List)
-              .map<CartItem>((item) => CartItem.fromJson(item))
-              .toList();
+          return (decoded['items'] as List).map<CartItem>((item) {
+            int productId = item['product_id'] ?? 0; // Default to 0 if null
+            int quantity = item['quantity'] ?? 1; // Default to 1 if null
+            return CartItem.fromJson({
+              'product_id': productId,
+              'quantity': quantity,
+            });
+          }).toList();
         }
 
-        if (decoded is String) {
-          throw Exception("Серверээс буцсан өгөгдөл: $decoded");
-        }
-
-        throw Exception("Танигдаагүй форматтай хариу: $decoded");
+        throw Exception("Unexpected format: $decoded");
       } catch (e) {
-        throw Exception("Картын өгөгдлийг боловсруулахад алдаа гарлаа: $e");
+        throw Exception("Error processing cart data: $e");
       }
     } else {
-      throw Exception('HTTP алдаа: ${response.statusCode}');
+      throw Exception('HTTP error: ${response.statusCode}');
     }
   }
 
@@ -464,10 +468,15 @@ class ApiService {
 
   static Future<bool> addToCart(int productId, int quantity) async {
     try {
-      final token = await getToken(); // Make sure to fetch the token
+      final token = await getToken();
       if (token == null) {
         _logger.e('⛔ No token found.');
         return false;
+      }
+
+      if (productId == null || quantity == null || quantity <= 0) {
+        _logger.e('⛔ Invalid productId or quantity.');
+        return false; // Check for invalid data before sending the request
       }
 
       final response = await http.post(
@@ -483,10 +492,10 @@ class ApiService {
       );
 
       if (response.statusCode == 201) {
-        _logger.i("✅ Сагсанд амжилттай нэмэгдлээ");
+        _logger.i("✅ Item added to cart successfully");
         return true;
       } else {
-        _logger.e("❌ Сагсанд нэмэхэд алдаа: ${response.statusCode}");
+        _logger.e("❌ Failed to add item to cart: ${response.statusCode}");
         return false;
       }
     } catch (e) {
