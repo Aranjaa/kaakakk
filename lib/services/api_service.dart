@@ -381,7 +381,7 @@ class ApiService {
 
   static Future<List<CartItem>> fetchCartItems(String token) async {
     final baseUrl =
-        'http://192.168.99.163:8000/api'; // Ensure this is the correct base URL
+        'http://192.168.99.163:8000'; // Ensure this is the correct base URL
     final url =
         '$baseUrl/api/cart/'; // This should now be http://192.168.99.163:8000/api/cart/
 
