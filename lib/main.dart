@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shopping/views/home.dart';
 import 'core/Provider/cart_provider.dart';
 import 'core/Provider/FavoriteProvider.dart'; // Provider class
+import 'core/Provider/auth_provider.dart';
 
 void main() {
   runApp(
@@ -12,6 +13,7 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => FavoriteProvider(),
         ), // Add FavoriteProvider here
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: const MyApp(),
     ),

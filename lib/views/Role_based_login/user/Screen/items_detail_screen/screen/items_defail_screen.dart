@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 import '../../../../../../core/model/product_model.dart';
 import '../../../../../../core/Provider/cart_provider.dart';
 import '../../../../../../core/Provider/FavoriteProvider.dart';
@@ -22,26 +23,77 @@ class _ItemsDefailScreenState extends State<ItemsDefailScreen> {
   Color selectedColor = Colors.blue;
   bool isFavorite = false; // Track favorite status
 
-  void _addToCart() {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    cartProvider.addToCart(widget.productModel); // Pass the quantity as well
+  void _addToCart() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Бүтээгдэхүүн картанд нэмэгдлээ!')),
-    );
+    if (token == null || token.isEmpty) {
+      // If no token, show login alert
+      _showLoginAlert();
+    } else {
+      // If token exists, proceed to add to cart
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      cartProvider.addToCart(widget.productModel); // Pass the quantity as well
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Бүтээгдэхүүн картанд нэмэгдлээ!')),
+      );
+    }
   }
 
-  void _buyNow() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => BuyNowScreen(
-              productId: widget.productModel.id,
-              price: widget.productModel.price.toDouble(), // <- Энэ хэсэг чухал
-              quantity: 1,
+  void _buyNow() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null || token.isEmpty) {
+      // If no token, show login alert
+      _showLoginAlert();
+    } else {
+      // If token exists, proceed to buy now screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => BuyNowScreen(
+                productId: widget.productModel.id,
+                price: widget.productModel.price.toDouble(),
+                quantity: 1,
+              ),
+        ),
+      );
+    }
+  }
+
+  // Show login alert dialog
+  void _showLoginAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Нэвтрэх шаардлагатай'),
+          content: const Text(
+            'Таны нэвтрэх мэдээлэл байхгүй байна. Нэвтэрнэ үү?',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text('Болих'),
             ),
-      ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                Navigator.pushNamed(
+                  context,
+                  '/login',
+                ); // Redirect to login screen
+              },
+              child: const Text('Нэвтрэх'),
+            ),
+          ],
+        );
+      },
     );
   }
 

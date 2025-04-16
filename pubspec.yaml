@@ -4,7 +4,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.7.2 <4.0.0" # Ensures compatibility with Flutter SDK 3.x
+  sdk: ">=3.0.0 <4.0.0" # Ensures compatibility with Flutter SDK 3.x
 
 dependencies:
   flutter:
@@ -37,3 +37,7 @@ flutter:
     - family: RobotoSerif
       fonts:
         - asset: assets/fonts/Roboto_Serif/static/RobotoSerif-Regular.ttf
+
+analyzer:
+  enable-experiment:
+    - super-parameters

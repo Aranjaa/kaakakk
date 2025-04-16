@@ -1,25 +1,35 @@
 class Subcategory {
   final int id;
-  final int categoryId;
   final String name;
-  final String description;
 
   Subcategory({
     required this.id,
-    required this.categoryId,
     required this.name,
-    required this.description,
   });
 
-  factory Subcategory.fromJson(Map<String, dynamic> json) {
+  // Default Subcategory method
+  static Subcategory defaultSubcategory() {
     return Subcategory(
-      id: json['id'],
-      categoryId: json['category'],
-      name: json['name'],
-      description: json['description'] ?? '',
+      id: 0,
+      name: 'Unknown Subcategory',
     );
   }
+
+  factory Subcategory.fromJson(Map<String, dynamic> json) {
+    if (json == null) {
+      return defaultSubcategory();
+    }
+
+    return Subcategory(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? 'Unknown Subcategory',
+    );
+  }
+
   Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name};
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }

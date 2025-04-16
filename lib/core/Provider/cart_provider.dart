@@ -15,8 +15,9 @@ class CartProvider with ChangeNotifier {
     } else {
       _items.add(
         CartItem(product: product, quantity: 1),
-      ); // Ensure quantity starts from 1
+      ); // Тоо нь эхлээд 1 байхаар нэмэх
     }
+    print('Сагсанд нэмэгдсэн бүтээгдэхүүн: ${product.name}');
     notifyListeners();
   }
 

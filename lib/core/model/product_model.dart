@@ -31,33 +31,35 @@ class Product {
     required this.color,
     required this.size,
   });
+  // Default Product method
+  static Product defaultProduct() {
+    return Product(
+      id: 0,
+      name: 'Unknown Product',
+      description: 'No description available.',
+      price: 0.0,
+      stock: 0,
+      image: '', // Default empty image URL
+      category:
+          Category.defaultCategory(), // Assuming defaultCategory is defined
+      subcategory: Subcategory
+          .defaultSubcategory(), // Assuming defaultSubcategory is defined
+      rating: 0.0,
+      reviews: 0,
+      isCheck: false,
+      color: [],
+      size: [],
+    );
+  }
 
   factory Product.fromJson(Map<String, dynamic> json) {
-    num parsedPrice;
-    // Хэрэв price талбар нь null бол 0.0
-    if (json['price'] == null) {
-      parsedPrice = 0.0;
-    } else if (json['price'] is String) {
-      // Хэрэв "price" string хэлбэртэй бол хөрвүүлнэ
-      parsedPrice = num.tryParse(json['price']) ?? 0.0;
-    } else if (json['price'] is num) {
-      // Хэрэв харьцангуй тоон утга бол шууд авна
-      parsedPrice = json['price'];
-    } else {
-      parsedPrice = 0.0;
-    }
+    num parsedPrice = json['price'] != null
+        ? num.tryParse(json['price'].toString()) ?? 0.0
+        : 0.0;
 
-    // rating талбарын хувьд ижил арга хэрэглэж болно, хэрэв шаардлагатай бол
-    double parsedRating;
-    if (json['rating'] == null) {
-      parsedRating = 0.0;
-    } else if (json['rating'] is String) {
-      parsedRating = double.tryParse(json['rating']) ?? 0.0;
-    } else if (json['rating'] is num) {
-      parsedRating = (json['rating'] as num).toDouble();
-    } else {
-      parsedRating = 0.0;
-    }
+    double parsedRating = json['rating'] != null
+        ? double.tryParse(json['rating'].toString()) ?? 0.0
+        : 0.0;
 
     return Product(
       id: json['id'] ?? 0,
@@ -66,8 +68,12 @@ class Product {
       price: parsedPrice,
       stock: json['stock'] ?? 0,
       image: json['image'] ?? '',
-      category: Category.fromJson(json['category'] ?? {}),
-      subcategory: Subcategory.fromJson(json['subcategory'] ?? {}),
+      category: json['category'] is Map
+          ? Category.fromJson(json['category'])
+          : Category(id: json['category'] ?? 0, name: ''),
+      subcategory: json['subcategory'] is Map
+          ? Subcategory.fromJson(json['subcategory'])
+          : Subcategory(id: json['subcategory'] ?? 0, name: ''),
       rating: parsedRating,
       reviews: json['reviews'] ?? 0,
       isCheck: json['isCheck'] ?? false,

@@ -280,12 +280,10 @@ class ApiService {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
 
-        final List<dynamic> filtered =
-            data.where((product) {
-              final productName =
-                  product['name']?.toString().toLowerCase() ?? '';
-              return productName.contains(query.toLowerCase());
-            }).toList();
+        final List<dynamic> filtered = data.where((product) {
+          final productName = product['name']?.toString().toLowerCase() ?? '';
+          return productName.contains(query.toLowerCase());
+        }).toList();
 
         return filtered;
       } else {
@@ -380,13 +378,13 @@ class ApiService {
     }
   }
 
-  static Future<List<dynamic>> fetchCartItems() async {
+  static Future<List<dynamic>?> fetchCartItems() async {
     try {
-      final token = await getToken();
+      final token =
+          await getToken(); // Assuming you have a function for fetching the token
       if (token == null) {
         _logger.e('⛔ Token олдсонгүй. Хэрэглэгч дахин нэвтрэх шаардлагатай.');
-        // TODO: Login page рүү navigate хийх логик нэмэж болно
-        return [];
+        return null;
       }
 
       final response = await http.get(
@@ -403,15 +401,53 @@ class ApiService {
         return data;
       } else if (response.statusCode == 401) {
         _logger.e('⛔ Token хүчингүй. Нэвтрэх шаардлагатай.');
-        // TODO: Token устгах ба login page рүү шилжүүлэх боломжтой
-        return [];
+        return null;
       } else {
         _logger.e('❌ Сагс татахад алдаа: ${response.statusCode}');
-        return [];
+        return null;
       }
     } catch (e) {
       _logger.e('🚨 Сагс татах үед алдаа: $e');
-      return [];
+      return null;
+    }
+  }
+
+  // Update cart item quantity
+  static Future<bool> updateCartItemQuantity(
+      int cartItemId, int quantity) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null || token.isEmpty) {
+      return false; // No token, cannot update cart item
+    }
+
+    final url = '$baseUrl/cart/$cartItemId/'; // Adjust the URL for your backend
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
+    final data = {
+      'quantity': quantity,
+    };
+
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Successfully updated the quantity
+      } else {
+        _logger.e('❌ Failed to update quantity: ${response.statusCode}');
+        return false; // Failed to update
+      }
+    } catch (e) {
+      _logger.e('🚨 Error updating cart item quantity: $e');
+      return false; // Error occurred during the request
     }
   }
 

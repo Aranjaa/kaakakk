@@ -6,6 +6,8 @@ import 'package:shopping/views/Role_based_login/singup_screen.dart';
 import 'package:shopping/views/Role_based_login/admin/screen/admin_home_screen.dart';
 import 'package:shopping/views/Role_based_login/user/Screen/user_app_first_screen.dart';
 import 'package:logger/logger.dart'; // Importing logger package
+import '../../core/Provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -34,43 +36,34 @@ class _LoginscreenState extends State<Loginscreen> {
       );
 
       if (response.statusCode == 200) {
-        // Decode the response body to a Map<String, dynamic>
         final Map<String, dynamic> responseData = json.decode(response.body);
-
-        // Extract role and token from the decoded JSON safely
-        final String? role =
-            responseData['role']; // This should be 'superuser' or 'user'
-        final String? token = responseData['token']; // The token
+        final String? role = responseData['role'];
+        final String? token = responseData['token'];
 
         if (role == null || token == null) {
           _showErrorDialog('Нэвтэрэх үед алдаа гарлаа!');
           return;
         }
 
-        // Save the token to SharedPreferences (for later use)
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
+        await prefs.setString('role', role);
 
-        // Handle role-based navigation
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.login(token); // Нэмэгдсэн хэсэг
+
         if (role == 'superuser') {
-          // Navigate to admin home page
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) => AdminHomeScreen(),
-            ), // Ensure AdminScreen is defined
+            MaterialPageRoute(builder: (_) => AdminHomeScreen()),
           );
         } else if (role == 'user') {
-          // Navigate to user home page
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) => UserAppFirstScreen(),
-            ), // Ensure UserScreen is defined
+            MaterialPageRoute(builder: (_) => UserAppFirstScreen()),
           );
         } else {
-          // Handle unknown role
-          _showErrorDialog('Нэвтэрэх үед алдаа гарлаа!');
+          _showErrorDialog('Роли тодорхойгүй байна!');
         }
 
         _logger.i('Нэвтрэх амжилттай');
