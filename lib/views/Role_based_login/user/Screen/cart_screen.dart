@@ -20,104 +20,103 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginAndFetchCart();
+    _checkLoginAndFetchCart(); // Check login status and fetch cart items
   }
 
-  // Логин шалгаад сагсны мэдээлэл авах
+  // ✅ SharedPreferences-оос токен авах функц
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
   Future<void> _checkLoginAndFetchCart() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Loginscreen()),
-        );
-      }
+      _showLoginAlert(); // Show login alert if no token found
     } else {
-      _fetchCartItems();
+      _fetchCartItems(); // Fetch cart items if token exists
     }
   }
 
-  // Сагсны мэдээлэл авах
-  Future<void> _fetchCartItems() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+  // Show login alert if the user is not logged in
+  void _showLoginAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Нэвтрэх шаардлагатай'),
+          content: Text('Та нэвтэрч орсонгүй. Нэвтрэх үү?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Үгүй'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Тийм'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Loginscreen()), // Redirect to login screen
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-    try {
-      final cartData = await ApiService.fetchCartItems();
-      _logger.e("API хариу: $cartData");
-
-      if (cartData == null) {
-        setState(() {
-          _errorMessage =
-              'Сагсны мэдээлэл татахад алдаа гарлаа. Та дахин оролдоно уу.';
-        });
-      } else if (cartData.isEmpty) {
-        setState(() {
-          _cartItems = [];
-          _totalPrice = 0;
-          _errorMessage = 'Сагсанд ямар ч бүтээгдэхүүн байхгүй.';
-        });
-      } else {
-        setState(() {
-          _cartItems = cartData.map((e) => CartItem.fromJson(e)).toList();
-          _totalPrice = _cartItems.fold(
-            0,
-            (sum, item) => sum + item.product.price * item.quantity,
-          );
-        });
-      }
-    } catch (e) {
+  // Fetch cart items if token is available
+  void _fetchCartItems() async {
+    String? token = await _getToken();
+    if (token != null) {
+      List<CartItem> items = await ApiService.fetchCartItems(token);
       setState(() {
-        _errorMessage =
-            'Сагсны мэдээлэл татах үед алдаа гарлаа. Та дахин оролдоно уу. Алдаа: $e';
+        _cartItems = items;
+        _calculateTotal(); // Calculate total price
       });
-      _logger.e('🚨 Error: $e'); // Error-ыг логод бичих
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    } else {
+      _logger.e('❗ Token олдсонгүй');
     }
   }
 
-  // Бүтээгдэхүүнийг сагснаас устгах
+  // Calculate the total price of the cart items
+  void _calculateTotal() {
+    _totalPrice = _cartItems.fold(
+      0,
+      (sum, item) => sum + item.product.price * item.quantity,
+    );
+  }
+
+  // Remove an item from the cart
   Future<void> _removeItem(int cartItemId) async {
-    setState(() {
-      _isLoading = true;
-    });
-
+    setState(() => _isLoading = true);
     try {
       final success = await ApiService.removeCartItem(cartItemId);
       if (success) {
         setState(() {
           _cartItems.removeWhere((item) => item.id == cartItemId);
-          _totalPrice = _cartItems.fold(
-            0,
-            (sum, item) => sum + item.product.price * item.quantity,
-          );
+          _calculateTotal();
         });
+        _showMessage('Амжилттай устгагдлаа');
       } else {
-        setState(() {
-          _errorMessage = 'Бүтээгдэхүүнийг устгахад алдаа гарлаа.';
-        });
+        _showMessage('Устгах үед алдаа гарлаа');
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage =
-            'Бүтээгдэхүүнийг устгах үед алдаа гарлаа. Дахин оролдоно уу.';
-      });
+    } catch (_) {
+      _showMessage('Сүлжээний алдаа. Дахин оролдоно уу.');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
-  // Захиалга үүсгэх
+  // Checkout process, create an order
   Future<void> _checkout() async {
     final orderData = {
       "items": _cartItems
@@ -129,142 +128,94 @@ class _CartScreenState extends State<CartScreen> {
       "total_price": _totalPrice,
     };
 
-    setState(() {
-      _isLoading = true;
-    });
-
+    setState(() => _isLoading = true);
     try {
       final success = await ApiService.createOrder(orderData);
       if (success) {
-        Navigator.pushNamed(context, '/payment');
+        _showMessage('Захиалга үүсгэлээ');
+        Navigator.pushNamed(context, '/payment'); // Navigate to payment screen
       } else {
-        setState(() {
-          _errorMessage = 'Захиалга үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.';
-        });
+        _showMessage('Захиалга үүсгэхэд алдаа гарлаа');
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage =
-            'Захиалга үүсгэхийн тулд интернет холболтоо шалгана уу.';
-      });
+    } catch (_) {
+      _showMessage('Интернет холболтоо шалгана уу');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
-  // Бүтээгдэхүүний тоо хэмжээг шинэчлэх
-  Future<void> _updateCartItemQuantity(int cartItemId, int quantity) async {
-    if (quantity <= 0) {
-      setState(() {
-        _errorMessage = 'Тооны хэмжээ 0-аас их байх ёстой.';
-      });
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final success =
-          await ApiService.updateCartItemQuantity(cartItemId, quantity);
-
-      if (success) {
-        setState(() {
-          _cartItems.firstWhere((item) => item.id == cartItemId).quantity =
-              quantity;
-          _totalPrice = _cartItems.fold(
-            0,
-            (sum, item) => sum + item.product.price * item.quantity,
-          );
-        });
-      } else {
-        setState(() {
-          _errorMessage = 'Бүтээгдэхүүний тоо хэмжээг шинэчлэхэд алдаа гарлаа.';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Бүтээгдэхүүний тоо хэмжээг шинэчлэхэд алдаа гарлаа.';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  // Show message in a SnackBar
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Миний сагс")),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _cartItems.isEmpty
-              ? Center(
-                  child: Text(
-                    "Таны сагс хоосон байна",
-                    style: TextStyle(fontSize: 18),
+      appBar: AppBar(title: Text("Cart")),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (_isLoading) CircularProgressIndicator(),
+            if (_errorMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_errorMessage, style: TextStyle(color: Colors.red)),
+              ),
+            if (_cartItems.isNotEmpty) ...[
+              for (var item in _cartItems)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Image.network(
+                        item.product.image,
+                        width: 50,
+                        height: 50,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          } else {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        (loadingProgress.expectedTotalBytes ??
+                                            1)
+                                    : null,
+                              ),
+                            );
+                          }
+                        },
+                        errorBuilder: (BuildContext context, Object error,
+                            StackTrace? stackTrace) {
+                          return Icon(Icons.error);
+                        },
+                      ),
+                      SizedBox(width: 10),
+                      Text(item.product.name),
+                      Spacer(),
+                      Text('\$${item.product.price}'),
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () => _removeItem(item.id),
+                      ),
+                    ],
                   ),
                 )
-              : ListView.builder(
-                  itemCount: _cartItems.length,
-                  itemBuilder: (context, index) {
-                    final item = _cartItems[index];
-                    return Card(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: ListTile(
-                        leading: Image.network(
-                          item.product.image,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ),
-                        title: Text(item.product.name),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Үнэ: ${item.product.price}₮"),
-                            Text(
-                                "Нийт: ${item.product.price * item.quantity}₮"),
-                          ],
-                        ),
-                        trailing: Column(
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.remove),
-                                  onPressed: () {
-                                    int newQty = item.quantity - 1;
-                                    if (newQty > 0) {
-                                      _updateCartItemQuantity(item.id, newQty);
-                                    }
-                                  },
-                                ),
-                                Text(item.quantity.toString()),
-                                IconButton(
-                                  icon: Icon(Icons.add),
-                                  onPressed: () {
-                                    int newQty = item.quantity + 1;
-                                    _updateCartItemQuantity(item.id, newQty);
-                                  },
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _removeItem(item.id),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+            ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: _checkout,
+                child: Text("Proceed to Checkout"),
+              ),
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: _cartItems.isNotEmpty
           ? Padding(
               padding: const EdgeInsets.all(12.0),
@@ -279,52 +230,11 @@ class _CartScreenState extends State<CartScreen> {
                     onPressed: _checkout,
                     icon: Icon(Icons.payment),
                     label: Text('Төлбөр хийх'),
-                    style: ElevatedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    ),
                   ),
                 ],
               ),
             )
           : null,
-    );
-  }
-
-  // Show dialog to update quantity
-  Future<int?> _showQuantityDialog(BuildContext context, int currentQuantity) {
-    TextEditingController _quantityController =
-        TextEditingController(text: currentQuantity.toString());
-
-    return showDialog<int>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Тоо хэмжээ сонгох'),
-          content: TextField(
-            controller: _quantityController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: 'Тооны хэмжээ'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Болих'),
-            ),
-            TextButton(
-              onPressed: () {
-                int? newQuantity = int.tryParse(_quantityController.text);
-                if (newQuantity != null && newQuantity > 0) {
-                  Navigator.of(context).pop(newQuantity);
-                }
-              },
-              child: Text('Шинэчлэх'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

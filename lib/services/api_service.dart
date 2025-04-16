@@ -6,6 +6,7 @@ import '../core/model/product_model.dart';
 import '../core/model/wishlists_model.dart';
 import '../core/model/StatusReport.dart';
 import '../core/model/user_profile_model.dart';
+import '../core/model/cart_item_model.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -378,61 +379,70 @@ class ApiService {
     }
   }
 
-  static Future<List<dynamic>?> fetchCartItems() async {
-    try {
-      final token =
-          await getToken(); // Assuming you have a function for fetching the token
-      if (token == null) {
-        _logger.e('⛔ Token олдсонгүй. Хэрэглэгч дахин нэвтрэх шаардлагатай.');
-        return null;
-      }
+  static Future<List<CartItem>> fetchCartItems(String token) async {
+    final baseUrl =
+        'http://192.168.99.163:8000/api'; // Ensure this is the correct base URL
+    final url =
+        '$baseUrl/api/cart/'; // This should now be http://192.168.99.163:8000/api/cart/
 
-      final response = await http.get(
-        Uri.parse('$baseUrl/cart/'),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
+    _logger.i('Request URL: $url'); // Check if the URL is correct
 
-      if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes));
-        _logger.i('✅ Сагсны мэдээлэл татагдлаа');
-        return data;
-      } else if (response.statusCode == 401) {
-        _logger.e('⛔ Token хүчингүй. Нэвтрэх шаардлагатай.');
-        return null;
-      } else {
-        _logger.e('❌ Сагс татахад алдаа: ${response.statusCode}');
-        return null;
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': 'Token $token'},
+    );
+
+    if (response.statusCode == 200) {
+      try {
+        final decoded = json.decode(response.body);
+
+        if (decoded is List) {
+          return decoded
+              .map<CartItem>((item) => CartItem.fromJson(item))
+              .toList();
+        }
+
+        if (decoded is Map && decoded['items'] is List) {
+          return (decoded['items'] as List)
+              .map<CartItem>((item) => CartItem.fromJson(item))
+              .toList();
+        }
+
+        if (decoded is String) {
+          throw Exception("Серверээс буцсан өгөгдөл: $decoded");
+        }
+
+        throw Exception("Танигдаагүй форматтай хариу: $decoded");
+      } catch (e) {
+        throw Exception("Картын өгөгдлийг боловсруулахад алдаа гарлаа: $e");
       }
-    } catch (e) {
-      _logger.e('🚨 Сагс татах үед алдаа: $e');
-      return null;
+    } else {
+      throw Exception('HTTP алдаа: ${response.statusCode}');
     }
   }
 
   // Update cart item quantity
   static Future<bool> updateCartItemQuantity(
       int cartItemId, int quantity) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token == null || token.isEmpty) {
-      return false; // No token, cannot update cart item
-    }
-
-    final url = '$baseUrl/cart/$cartItemId/'; // Adjust the URL for your backend
-    final headers = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    };
-
-    final data = {
-      'quantity': quantity,
-    };
-
     try {
+      final token =
+          await getToken(); // Ensure token fetching is handled consistently
+      if (token == null || token.isEmpty) {
+        _logger.e('⛔ No token found.');
+        return false; // No token, cannot update cart item
+      }
+
+      final url =
+          '$baseUrl/cart/$cartItemId/'; // Adjust the URL for your backend
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final data = {
+        'quantity': quantity,
+      };
+
       final response = await http.patch(
         Uri.parse(url),
         headers: headers,
@@ -440,6 +450,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
+        _logger.i('✅ Бүтээгдэхүүний тоог амжилттай шинэчиллээ');
         return true; // Successfully updated the quantity
       } else {
         _logger.e('❌ Failed to update quantity: ${response.statusCode}');
@@ -453,40 +464,50 @@ class ApiService {
 
   static Future<bool> addToCart(int productId, int quantity) async {
     try {
-      final token = await getToken();
-      if (token == null || token.isEmpty) {
-        throw 'Token not found';
+      final token = await getToken(); // Make sure to fetch the token
+      if (token == null) {
+        _logger.e('⛔ No token found.');
+        return false;
       }
 
       final response = await http.post(
-        Uri.parse('$baseUrl/cart/'),
+        Uri.parse('$baseUrl/cart-items/'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
         },
-        body: jsonEncode({"product_id": productId, "quantity": quantity}),
+        body: json.encode({
+          "product": productId,
+          "quantity": quantity,
+        }),
       );
 
       if (response.statusCode == 201) {
-        _logger.i('Сагсанд амжилттай нэмэгдлээ');
+        _logger.i("✅ Сагсанд амжилттай нэмэгдлээ");
         return true;
       } else {
-        _logger.e('Сагсанд нэмэх үед алдаа: ${response.statusCode}');
+        _logger.e("❌ Сагсанд нэмэхэд алдаа: ${response.statusCode}");
         return false;
       }
     } catch (e) {
-      _logger.e('Сагсанд нэмэх үед алдаа: $e');
+      _logger.e("🚨 Error adding item to cart: $e");
       return false;
     }
   }
 
   static Future<bool> removeCartItem(int itemId) async {
     try {
+      final token = await getToken(); // Ensure token is fetched
+      if (token == null) {
+        _logger.e('⛔ No token found.');
+        return false;
+      }
+
       final response = await http.delete(
         Uri.parse('$baseUrl/cart/$itemId/'),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${await getToken()}",
+          "Authorization": "Bearer $token",
         },
       );
 

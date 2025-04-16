@@ -16,10 +16,6 @@ class Category {
   }
 
   factory Category.fromJson(Map<String, dynamic> json) {
-    if (json == null) {
-      return defaultCategory();
-    }
-
     return Category(
       id: json['id'] ?? 0,
       name: json['name'] ?? 'Unknown Category',

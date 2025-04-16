@@ -13,10 +13,27 @@ Future<void> buyNow({
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
 
+  // Token check
   if (token.isEmpty) {
-    // Token is missing, show error message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Токен алга, дахин нэвтэрнэ үү.')),
+    );
+    return;
+  }
+
+  // Validation for product price and quantity
+  if (price <= 0 || quantity <= 0) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content: Text('Бүтээгдэхүүний үнэ болон тоо хэмжээ зөв байх ёстой.')),
+    );
+    return;
+  }
+
+  // Validation for payment method
+  if (method.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Төлбөрийн аргаа сонгоно уу.')),
     );
     return;
   }
@@ -31,8 +48,7 @@ Future<void> buyNow({
     "payment": {
       "method": method,
       "status": false,
-      "transaction_id":
-          "", // You can add the transaction ID after payment completion
+      "transaction_id": "", // Optional, to be filled later after payment
     },
   };
 
@@ -46,29 +62,34 @@ Future<void> buyNow({
       body: jsonEncode(body),
     );
 
+    // Check if response is successful
     if (response.statusCode == 201) {
       // Order successfully created
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Таны захиалга амжилттай баталгаажлаа!')),
       );
-      // Optionally, navigate to an order confirmation screen or home page
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OrderConfirmationScreen()));
+
+      // Optionally navigate to an order confirmation screen
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (_) => OrderConfirmationScreen()),
+      // );
     } else {
       // API returned an error
       final responseData = jsonDecode(response.body);
-      String errorMessage =
-          responseData['detail'] ?? 'Захиалга үүсгэхэд алдаа гарлаа';
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      String errorMessage = responseData.containsKey('detail')
+          ? responseData['detail']
+          : 'Захиалга үүсгэхэд алдаа гарлаа';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     }
   } catch (e) {
-    // Network or other errors
+    // Handle network or other errors
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Сүлжээний алдаа гарлаа. Та дараа дахин оролдож үзнэ үү.',
-        ),
+        content:
+            Text('Сүлжээний алдаа гарлаа. Та дараа дахин оролдож үзнэ үү.'),
       ),
     );
     print("Error: $e");

@@ -16,10 +16,6 @@ class Subcategory {
   }
 
   factory Subcategory.fromJson(Map<String, dynamic> json) {
-    if (json == null) {
-      return defaultSubcategory();
-    }
-
     return Subcategory(
       id: json['id'] ?? 0,
       name: json['name'] ?? 'Unknown Subcategory',

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shopping/services/api_service.dart';
+import 'package:shopping/views/home.dart';
 import '../../../../core/model/user_profile_model.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart'; // HomeScreen импорт
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -95,8 +96,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await ApiService.logout(); // Токен болон хэрэглэгчийн мэдээллийг цэвэрлэх
-                    Navigator.pushReplacementNamed(context, '/login');
+                    await ApiService
+                        .logout(); // Токен болон хэрэглэгчийн мэдээллийг цэвэрлэх
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => HomeScren()), // HomeScreen руу шилжих
+                    );
                   },
                   child: const Text('Гарах'),
                 ),

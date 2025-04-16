@@ -32,26 +32,6 @@ class Product {
     required this.size,
   });
   // Default Product method
-  static Product defaultProduct() {
-    return Product(
-      id: 0,
-      name: 'Unknown Product',
-      description: 'No description available.',
-      price: 0.0,
-      stock: 0,
-      image: '', // Default empty image URL
-      category:
-          Category.defaultCategory(), // Assuming defaultCategory is defined
-      subcategory: Subcategory
-          .defaultSubcategory(), // Assuming defaultSubcategory is defined
-      rating: 0.0,
-      reviews: 0,
-      isCheck: false,
-      color: [],
-      size: [],
-    );
-  }
-
   factory Product.fromJson(Map<String, dynamic> json) {
     num parsedPrice = json['price'] != null
         ? num.tryParse(json['price'].toString()) ?? 0.0

@@ -25,7 +25,7 @@ class _BuyNowScreenState extends State<BuyNowScreen> {
   final _city = TextEditingController();
   final _street = TextEditingController();
   final _postalCode = TextEditingController();
-  String selectedMethod = "";
+  String selectedMethod = "card"; // Default value
 
   Future<void> buyNow() async {
     if (!_formKey.currentState!.validate()) return;
@@ -59,7 +59,7 @@ class _BuyNowScreenState extends State<BuyNowScreen> {
         "postal_code": _postalCode.text,
       },
       "payment": {
-        "method": selectedMethod.isNotEmpty ? selectedMethod : "card",
+        "method": selectedMethod,
         "status": false,
         "transaction_id": "",
       },
@@ -119,38 +119,29 @@ class _BuyNowScreenState extends State<BuyNowScreen> {
               TextFormField(
                 controller: _country,
                 decoration: const InputDecoration(labelText: 'Улс'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Улс оруулна уу'
-                            : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Улс оруулна уу' : null,
               ),
               TextFormField(
                 controller: _city,
                 decoration: const InputDecoration(labelText: 'Хот'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Хот оруулна уу'
-                            : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Хот оруулна уу' : null,
               ),
               TextFormField(
                 controller: _street,
                 decoration: const InputDecoration(labelText: 'Гудамж'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Гудамж оруулна уу'
-                            : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Гудамж оруулна уу' : null,
               ),
               TextFormField(
                 controller: _postalCode,
                 decoration: const InputDecoration(labelText: 'Шуудангийн код'),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Шуудангийн код оруулна уу'
-                            : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Шуудангийн код оруулна уу'
+                    : null,
+                keyboardType: TextInputType
+                    .number, // Ensure numeric input for postal code
               ),
 
               const SizedBox(height: 16),
