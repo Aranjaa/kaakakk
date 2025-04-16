@@ -379,49 +379,20 @@ class ApiService {
     }
   }
 
-  static Future<List<CartItem>> fetchCartItems(String token) async {
-    final baseUrl = 'http://192.168.99.163:8000';
-    final url = '$baseUrl/api/cart/';
-
-    _logger.i('Request URL: $url');
-
+  static Future<List<Map<String, dynamic>>> fetchCartItems(String token) async {
     final response = await http.get(
-      Uri.parse(url),
-      headers: {'Authorization': 'Token $token'},
+      Uri.parse('$baseUrl/api/cart/'),
+      headers: {
+        'Authorization': 'Token $token',
+        'Content-Type': 'application/json',
+      },
     );
 
     if (response.statusCode == 200) {
-      try {
-        final decoded = json.decode(response.body);
-
-        if (decoded is List) {
-          return decoded.map<CartItem>((item) {
-            int productId = item['product_id'] ?? 0; // Default to 0 if null
-            int quantity = item['quantity'] ?? 1; // Default to 1 if null
-            return CartItem.fromJson({
-              'product_id': productId,
-              'quantity': quantity,
-            });
-          }).toList();
-        }
-
-        if (decoded is Map && decoded['items'] is List) {
-          return (decoded['items'] as List).map<CartItem>((item) {
-            int productId = item['product_id'] ?? 0; // Default to 0 if null
-            int quantity = item['quantity'] ?? 1; // Default to 1 if null
-            return CartItem.fromJson({
-              'product_id': productId,
-              'quantity': quantity,
-            });
-          }).toList();
-        }
-
-        throw Exception("Unexpected format: $decoded");
-      } catch (e) {
-        throw Exception("Error processing cart data: $e");
-      }
+      final List<dynamic> data = json.decode(response.body);
+      return data.cast<Map<String, dynamic>>(); // ✅ cast to correct type
     } else {
-      throw Exception('HTTP error: ${response.statusCode}');
+      throw Exception('Failed to load cart items');
     }
   }
 
