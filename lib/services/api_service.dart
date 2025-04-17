@@ -381,7 +381,7 @@ class ApiService {
 
   static Future<List<Map<String, dynamic>>> fetchCartItems(String token) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/api/cart/'),
+      Uri.parse('$baseUrl/cart/'),
       headers: {
         'Authorization': 'Token $token',
         'Content-Type': 'application/json',
@@ -390,8 +390,10 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      return data.cast<Map<String, dynamic>>(); // ✅ cast to correct type
+      return data.cast<Map<String, dynamic>>();
     } else {
+      _logger.e('❌ API Error: ${response.statusCode}');
+      _logger.e('❌ Response body: ${response.body}');
       throw Exception('Failed to load cart items');
     }
   }
@@ -509,7 +511,7 @@ class ApiService {
   static Future<bool> createOrder(Map<String, dynamic> orderData) async {
     final token = await getToken();
     final response = await http.post(
-      Uri.parse('$baseUrl/api/orders/create/'),
+      Uri.parse('$baseUrl/orders/create/'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

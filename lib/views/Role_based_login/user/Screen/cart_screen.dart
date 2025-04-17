@@ -107,6 +107,9 @@ class _CartScreenState extends State<CartScreen> {
         }
       } catch (e) {
         _logger.e("Error parsing cart items: $e");
+        setState(() {
+          _errorMessage = "Сагсны мэдээллийг ачааллах үед алдаа гарлаа.";
+        });
       }
     } else {
       _logger.e('❗ Token олдсонгүй');
